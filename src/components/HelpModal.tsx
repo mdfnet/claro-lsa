@@ -1,4 +1,4 @@
-import { X, Hand, MessageCircle, Smartphone, Volume2 } from 'lucide-react';
+import { X, Hand, MessageCircle, Smartphone, Eye, EarOff, Camera, Sun } from 'lucide-react';
 
 interface HelpModalProps {
   onClose: () => void;
@@ -16,87 +16,100 @@ export default function HelpModal({ onClose }: HelpModalProps) {
           />
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label="Cerrar"
+            className="p-3 hover:bg-gray-100 active:bg-gray-200 rounded-full transition-colors touch-manipulation"
           >
-            <X className="w-6 h-6 text-gray-600" />
+            <X className="w-7 h-7 text-gray-600" />
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
-          <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <Volume2 className="w-6 h-6 text-[#DA291C]" />
-              Bienvenido a Dillo
+        <div className="p-6 space-y-8">
+          <div className="bg-gradient-to-br from-[#DA291C] to-[#B01F16] rounded-2xl p-6 sm:p-8 text-center">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
+              <EarOff className="w-8 h-8 sm:w-10 sm:h-10 text-white" strokeWidth={2} />
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-black text-white mb-2">
+              No necesitás hablar ni escuchar
             </h3>
-            <p className="text-gray-700">
-              Dillo es una herramienta de comunicación accesible diseñada para facilitar la interacción entre personas sordas y el personal de atención al cliente de Claro.
+            <p className="text-white/90 text-base sm:text-lg">
+              Todo en Dillo es visual: señas, texto grande en pantalla y mensajes que le mostrás a la persona que te atiende.
             </p>
           </div>
 
-          <div className="space-y-4">
-            <div className="border-l-4 border-[#DA291C] pl-4">
-              <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                <Hand className="w-5 h-5 text-[#DA291C]" />
-                Hablo con mis manos
-              </h4>
-              <p className="text-gray-700 text-sm">
-                Presiona este botón para abrir el intérprete de lengua de señas. Podrás comunicarte mediante señas que serán interpretadas y convertidas a texto y voz.
-              </p>
+          <div className="space-y-5">
+            <h4 className="text-xl sm:text-2xl font-bold text-gray-900 text-center">3 formas simples de usar Dillo</h4>
+
+            <div className="flex items-start gap-4 bg-gray-50 rounded-2xl p-5">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#DA291C] rounded-xl flex items-center justify-center flex-shrink-0">
+                <Hand className="w-6 h-6 sm:w-7 sm:h-7 text-white" strokeWidth={2} />
+              </div>
+              <div>
+                <h5 className="font-bold text-gray-900 text-lg mb-1">1. Hablo con mis manos</h5>
+                <p className="text-gray-700 text-base leading-relaxed">
+                  Tocá este botón y comunicate en lengua de señas frente a la cámara. Tu seña se convierte en texto y voz para la persona que te atiende.
+                </p>
+              </div>
             </div>
 
-            <div className="border-l-4 border-[#DA291C] pl-4">
-              <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                <MessageCircle className="w-5 h-5 text-[#DA291C]" />
-                Responder con Dillo
-              </h4>
-              <p className="text-gray-700 text-sm">
-                Presiona este botón para que el avatar de Dillo te responda. El avatar convertirá el texto en voz y señas para facilitar la comunicación.
-              </p>
+            <div className="flex items-start gap-4 bg-gray-50 rounded-2xl p-5">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#DA291C] rounded-xl flex items-center justify-center flex-shrink-0">
+                <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" strokeWidth={2} />
+              </div>
+              <div>
+                <h5 className="font-bold text-gray-900 text-lg mb-1">2. Responder con Dillo</h5>
+                <p className="text-gray-700 text-base leading-relaxed">
+                  Tocá este botón para ver la respuesta de la persona traducida a lengua de señas por el avatar de Dillo.
+                </p>
+              </div>
             </div>
 
-            <div className="border-l-4 border-[#DA291C] pl-4">
-              <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                <Smartphone className="w-5 h-5 text-[#DA291C]" />
-                Toques Rápidos
-              </h4>
-              <p className="text-gray-700 text-sm">
-                Los botones de toques rápidos te permiten acceder directamente a los servicios más comunes de Claro. Simplemente presiona el botón correspondiente y el sistema reproducirá un mensaje de voz describiendo tu solicitud.
-              </p>
-              <ul className="mt-2 space-y-1 text-sm text-gray-600 ml-4">
-                <li>• <strong>Comprar un celular:</strong> Para consultas sobre nuevos equipos</li>
-                <li>• <strong>Pagar mi factura:</strong> Para realizar pagos o consultar facturas</li>
-                <li>• <strong>Soporte técnico:</strong> Para problemas técnicos con tu servicio</li>
-                <li>• <strong>Otro trámite:</strong> Para cualquier otra consulta o gestión</li>
-              </ul>
+            <div className="flex items-start gap-4 bg-gray-50 rounded-2xl p-5">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#DA291C] rounded-xl flex items-center justify-center flex-shrink-0">
+                <Smartphone className="w-6 h-6 sm:w-7 sm:h-7 text-white" strokeWidth={2} />
+              </div>
+              <div>
+                <h5 className="font-bold text-gray-900 text-lg mb-1">3. Toques Rápidos</h5>
+                <p className="text-gray-700 text-base leading-relaxed">
+                  Tocá el botón de lo que necesitás (pagar factura, soporte técnico, etc.). Aparece en letras grandes en la pantalla, lista para mostrar.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 bg-[#DA291C]/5 border-2 border-[#DA291C]/20 rounded-2xl p-5">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white border-2 border-[#DA291C] rounded-xl flex items-center justify-center flex-shrink-0">
+                <Eye className="w-6 h-6 sm:w-7 sm:h-7 text-[#DA291C]" strokeWidth={2} />
+              </div>
+              <div>
+                <h5 className="font-bold text-gray-900 text-lg mb-1">Mostrale la pantalla</h5>
+                <p className="text-gray-700 text-base leading-relaxed">
+                  Después de un toque rápido, girá el celular hacia la persona que te atiende para que lea el mensaje grande en pantalla.
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-gray-50 rounded-xl p-6">
-            <h4 className="font-bold text-gray-900 mb-3">Consejos útiles</h4>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li className="flex gap-2">
-                <span className="text-[#DA291C] font-bold">1.</span>
-                <span>Asegúrate de tener tu cámara habilitada si vas a usar lengua de señas</span>
+          <div className="bg-gray-50 rounded-2xl p-6">
+            <h4 className="font-bold text-gray-900 text-lg mb-4">Consejos útiles</h4>
+            <ul className="space-y-4">
+              <li className="flex gap-3">
+                <Camera className="w-6 h-6 text-[#DA291C] flex-shrink-0" strokeWidth={2} />
+                <span className="text-base text-gray-700">Activá el permiso de cámara para poder usar lengua de señas</span>
               </li>
-              <li className="flex gap-2">
-                <span className="text-[#DA291C] font-bold">2.</span>
-                <span>Verifica que tu navegador tenga permisos de audio y video</span>
+              <li className="flex gap-3">
+                <Sun className="w-6 h-6 text-[#DA291C] flex-shrink-0" strokeWidth={2} />
+                <span className="text-base text-gray-700">Buscá un lugar con buena luz para que tus señas se vean claras</span>
               </li>
-              <li className="flex gap-2">
-                <span className="text-[#DA291C] font-bold">3.</span>
-                <span>Para mejor experiencia, usa una buena iluminación al hacer señas</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-[#DA291C] font-bold">4.</span>
-                <span>Los toques rápidos te ahorran tiempo al comunicar necesidades comunes</span>
+              <li className="flex gap-3">
+                <Smartphone className="w-6 h-6 text-[#DA291C] flex-shrink-0" strokeWidth={2} />
+                <span className="text-base text-gray-700">Los Toques Rápidos te ahorran tiempo: un solo toque y ya está listo para mostrar</span>
               </li>
             </ul>
           </div>
 
-          <div className="text-center pt-4">
+          <div className="text-center pt-2">
             <button
               onClick={onClose}
-              className="px-8 py-3 bg-[#DA291C] hover:bg-[#B01F16] text-white rounded-full font-medium transition-colors"
+              className="px-10 py-4 bg-[#DA291C] hover:bg-[#B01F16] active:bg-[#8f1811] text-white rounded-2xl text-lg font-bold transition-colors touch-manipulation shadow-lg"
             >
               Entendido
             </button>

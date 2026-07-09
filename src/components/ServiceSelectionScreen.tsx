@@ -3,6 +3,7 @@ import { Hand, MessageCircle, Smartphone, CreditCard, Headphones, FileText, Help
 import Footer from './Footer';
 import HelpModal from './HelpModal';
 import IframeModal from './IframeModal';
+import QuickTouchScreen from './QuickTouchScreen';
 
 interface ServiceSelectionScreenProps {
   onSelectService: (service: string) => void;
@@ -11,51 +12,7 @@ interface ServiceSelectionScreenProps {
 export default function ServiceSelectionScreen({ onSelectService }: ServiceSelectionScreenProps) {
   const [showHelp, setShowHelp] = useState(false);
   const [iframeModal, setIframeModal] = useState<{ url: string; title: string } | null>(null);
-
-  const speakText = (text: string) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-
-      const utterance = new SpeechSynthesisUtterance(text);
-
-      const voices = window.speechSynthesis.getVoices();
-
-      const latinAmericanVoice = voices.find(voice =>
-        (voice.lang.startsWith('es-419') ||
-         voice.lang.startsWith('es-MX') ||
-         voice.lang.startsWith('es-AR') ||
-         voice.lang.startsWith('es-CO') ||
-         voice.lang.startsWith('es-CL') ||
-         voice.lang.startsWith('es-VE') ||
-         voice.lang.startsWith('es-PE') ||
-         voice.lang.startsWith('es-UY')) &&
-        !voice.name.toLowerCase().includes('spain') &&
-        !voice.name.toLowerCase().includes('españa')
-      );
-
-      const neutralSpanishVoice = latinAmericanVoice || voices.find(voice =>
-        voice.lang.startsWith('es') &&
-        !voice.lang.startsWith('es-ES') &&
-        !voice.name.toLowerCase().includes('spain') &&
-        !voice.name.toLowerCase().includes('españa')
-      );
-
-      const fallbackVoice = neutralSpanishVoice || voices.find(voice =>
-        voice.lang.startsWith('es')
-      );
-
-      if (fallbackVoice) {
-        utterance.voice = fallbackVoice;
-      }
-
-      utterance.lang = 'es-419';
-      utterance.rate = 0.85;
-      utterance.pitch = 1.0;
-      utterance.volume = 1;
-
-      window.speechSynthesis.speak(utterance);
-    }
-  };
+  const [activeQuickTouch, setActiveQuickTouch] = useState<{ title: string; speech: string; icon: any } | null>(null);
 
   const quickTouchServices = [
     {
@@ -228,7 +185,9 @@ export default function ServiceSelectionScreen({ onSelectService }: ServiceSelec
                 return (
                   <button
                     key={service.id}
-                    onClick={() => speakText(service.speech)}
+                    onClick={() => {
+                      setActiveQuickTouch({ title: service.title, speech: service.speech, icon: Icon });
+                    }}
                     className="group bg-gray-50 hover:bg-[#DA291C] border-2 border-gray-200 hover:border-[#DA291C] rounded-xl p-6 transition-all duration-300 hover:shadow-lg md:hover:scale-[1.02] touch-manipulation"
                   >
                     <div className="flex flex-col items-center text-center gap-3">
@@ -249,6 +208,14 @@ export default function ServiceSelectionScreen({ onSelectService }: ServiceSelec
       </div>
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+      {activeQuickTouch && (
+        <QuickTouchScreen
+          title={activeQuickTouch.title}
+          speech={activeQuickTouch.speech}
+          icon={activeQuickTouch.icon}
+          onClose={() => setActiveQuickTouch(null)}
+        />
+      )}
       {iframeModal && (
         <IframeModal
           url={iframeModal.url}

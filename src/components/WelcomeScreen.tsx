@@ -7,10 +7,17 @@ interface WelcomeScreenProps {
   onAbout: () => void;
 }
 
+const MOVE_START_THRESHOLD = 4;
+
 export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const avatarRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasPlayedOnce, setHasPlayedOnce] = useState(false);
+
+  const [avatarPosition, setAvatarPosition] = useState<{ x: number; y: number } | null>(null);
+  const [isDraggingAvatar, setIsDraggingAvatar] = useState(false);
+  const dragOriginRef = useRef<{ pointerX: number; pointerY: number; posX: number; posY: number } | null>(null);
 
   useEffect(() => {
     if (videoRef.current && !hasPlayedOnce) {
@@ -19,6 +26,87 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
       setHasPlayedOnce(true);
     }
   }, [hasPlayedOnce]);
+
+  const clampToViewport = (x: number, y: number) => {
+    const el = avatarRef.current;
+    const width = el?.offsetWidth ?? 0;
+    const height = el?.offsetHeight ?? 0;
+    const maxX = Math.max(window.innerWidth - width, 0);
+    const maxY = Math.max(window.innerHeight - height, 0);
+    return { x: Math.min(Math.max(x, 0), maxX), y: Math.min(Math.max(y, 0), maxY) };
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setAvatarPosition((prev) => (prev ? clampToViewport(prev.x, prev.y) : prev));
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (!isDraggingAvatar) return;
+
+    const { body, documentElement: html } = document;
+    const prevBodyOverflow = body.style.overflow;
+    const prevBodyTouchAction = body.style.touchAction;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevHtmlOverscroll = html.style.overscrollBehavior;
+
+    body.style.overflow = 'hidden';
+    body.style.touchAction = 'none';
+    html.style.overflow = 'hidden';
+    html.style.overscrollBehavior = 'none';
+
+    return () => {
+      body.style.overflow = prevBodyOverflow;
+      body.style.touchAction = prevBodyTouchAction;
+      html.style.overflow = prevHtmlOverflow;
+      html.style.overscrollBehavior = prevHtmlOverscroll;
+    };
+  }, [isDraggingAvatar]);
+
+  const handleAvatarPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+    const el = avatarRef.current;
+    const rect = el?.getBoundingClientRect();
+    const basePos = avatarPosition ?? { x: rect?.left ?? 0, y: rect?.top ?? 0 };
+    dragOriginRef.current = {
+      pointerX: e.clientX,
+      pointerY: e.clientY,
+      posX: basePos.x,
+      posY: basePos.y,
+    };
+    el?.setPointerCapture?.(e.pointerId);
+  };
+
+  const handleAvatarPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const origin = dragOriginRef.current;
+    if (!origin) return;
+
+    const dx = e.clientX - origin.pointerX;
+    const dy = e.clientY - origin.pointerY;
+
+    if (!isDraggingAvatar) {
+      if (Math.hypot(dx, dy) < MOVE_START_THRESHOLD) return;
+      setIsDraggingAvatar(true);
+      if (navigator.vibrate) navigator.vibrate(10);
+    }
+
+    e.preventDefault();
+    setAvatarPosition(clampToViewport(origin.posX + dx, origin.posY + dy));
+  };
+
+  const endAvatarPress = (e: React.PointerEvent<HTMLDivElement>) => {
+    dragOriginRef.current = null;
+    setIsDraggingAvatar(false);
+    try {
+      avatarRef.current?.releasePointerCapture?.(e.pointerId);
+    } catch {
+      // pointer capture may already be released
+    }
+  };
 
   const handlePlayVideo = () => {
     if (videoRef.current) {
@@ -34,14 +122,24 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#DA291C] to-[#B01F16] flex flex-col animate-fade-in relative overflow-hidden">
-      <div className="absolute top-8 right-8 sm:top-12 sm:right-12 md:top-16 md:right-16 z-10">
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 w-32 sm:w-40 md:w-48 shadow-2xl">
+      <div
+        ref={avatarRef}
+        onPointerDown={handleAvatarPointerDown}
+        onPointerMove={handleAvatarPointerMove}
+        onPointerUp={endAvatarPress}
+        onPointerCancel={endAvatarPress}
+        style={avatarPosition ? { left: avatarPosition.x, top: avatarPosition.y } : undefined}
+        className={`z-10 touch-none select-none ${
+          avatarPosition ? 'fixed' : 'absolute bottom-8 right-8 sm:bottom-12 sm:right-12 md:bottom-16 md:right-16'
+        } ${isDraggingAvatar ? 'scale-110 cursor-grabbing transition-none' : 'cursor-grab transition-transform duration-150'}`}
+      >
+        <div className={`bg-white/10 backdrop-blur-sm rounded-2xl p-3 w-32 sm:w-40 md:w-48 shadow-2xl ${isDraggingAvatar ? 'shadow-[0_0_0_3px_rgba(255,255,255,0.6)]' : ''}`}>
           <video
             ref={videoRef}
             muted
             playsInline
             onEnded={handleVideoEnded}
-            className="w-full h-auto rounded-xl"
+            className="w-full h-auto rounded-xl pointer-events-none"
           >
             <source src="https://dillo.ai/videos/Iniciar-avatar.mp4" type="video/mp4" />
           </video>
