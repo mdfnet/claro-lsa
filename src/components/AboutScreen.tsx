@@ -24,10 +24,10 @@ export default function AboutScreen({ onBack, onHelp }: AboutScreenProps) {
 
           <div className="text-center space-y-4 mb-8">
             <h1 className="text-4xl sm:text-5xl font-bold text-gray-900">
-              Acerca de
+              Conocer Dillo
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Un proyecto de inclusión y accesibilidad
+              Comunicación y respeto para todos
             </p>
           </div>
 
@@ -39,16 +39,15 @@ export default function AboutScreen({ onBack, onHelp }: AboutScreenProps) {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                    Nuestra Misión
+                    Qué Queremos
                   </h2>
                   <p className="text-gray-700 text-lg leading-relaxed">
-                    Este sistema de atención está diseñado para eliminar barreras de comunicación
-                    y garantizar que todas las personas, sin importar su capacidad auditiva, puedan
-                    acceder a nuestros servicios de manera autónoma y digna.
+                    Esta aplicación ayuda a personas sordas y a personas que no pueden hablar.
+                    Queremos que todos puedan usar nuestro servicio solos, con respeto.
                   </p>
                   <p className="text-gray-700 text-lg leading-relaxed mt-3">
-                    Creemos en la tecnología como herramienta de inclusión y estamos comprometidos
-                    con crear experiencias accesibles para todos.
+                    Creemos que la tecnología puede unir a todos. Trabajamos todos los días
+                    para mejorar.
                   </p>
                 </div>
               </div>
@@ -61,28 +60,28 @@ export default function AboutScreen({ onBack, onHelp }: AboutScreenProps) {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold mb-3">
-                    Compromiso con la Comunidad Sorda
+                    Trabajamos con Personas Sordas
                   </h2>
                   <p className="text-lg leading-relaxed mb-4">
-                    Trabajamos continuamente con la comunidad sorda para mejorar nuestros servicios
-                    y asegurarnos de que responden a las necesidades reales de nuestros usuarios.
+                    Escuchamos a personas sordas para mejorar nuestro servicio. Queremos
+                    responder a su necesidad real.
                   </p>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">✓</span>
-                      <span>Diseñado con y para personas sordas</span>
+                      <span>Hecho para personas sordas</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">✓</span>
-                      <span>Interfaz visual clara y accesible</span>
+                      <span>Todo visual y claro</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">✓</span>
-                      <span>Sin barreras de comunicación</span>
+                      <span>Comunicación clara para todos</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">✓</span>
-                      <span>Mejora continua basada en retroalimentación</span>
+                      <span>Mejoramos todos los días</span>
                     </div>
                   </div>
                 </div>
@@ -96,29 +95,28 @@ export default function AboutScreen({ onBack, onHelp }: AboutScreenProps) {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                    Tecnología de Vanguardia
+                    Tecnología Nueva
                   </h2>
                   <p className="text-gray-700 text-lg leading-relaxed">
-                    Utilizamos inteligencia artificial avanzada para el reconocimiento de lenguaje
-                    de señas en tiempo real. Nuestro sistema aprende continuamente para ofrecer
-                    traducciones cada vez más precisas y naturales.
+                    Usamos inteligencia artificial para ser tu intérprete de señas ahora mismo.
+                    Aprendemos todos los días para traducir mejor.
                   </p>
                   <div className="mt-4 grid sm:grid-cols-2 gap-3">
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="font-semibold text-gray-900 mb-1">Reconocimiento en tiempo real</p>
-                      <p className="text-gray-600 text-sm">Traduce tus señas instantáneamente</p>
+                      <p className="font-semibold text-gray-900 mb-1">Ahora Mismo</p>
+                      <p className="text-gray-600 text-sm">Tu intérprete, ahora</p>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="font-semibold text-gray-900 mb-1">Interfaz intuitiva</p>
-                      <p className="text-gray-600 text-sm">Fácil de usar sin capacitación previa</p>
+                      <p className="font-semibold text-gray-900 mb-1">Todo Claro</p>
+                      <p className="text-gray-600 text-sm">Aprendé y usá ahora</p>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="font-semibold text-gray-900 mb-1">Privacidad garantizada</p>
-                      <p className="text-gray-600 text-sm">Tus datos están protegidos</p>
+                      <p className="font-semibold text-gray-900 mb-1">Todo Privado</p>
+                      <p className="text-gray-600 text-sm">Todo seguro para ti</p>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="font-semibold text-gray-900 mb-1">Disponible 24/7</p>
-                      <p className="text-gray-600 text-sm">Atención cuando la necesites</p>
+                      <p className="font-semibold text-gray-900 mb-1">Todos los Días</p>
+                      <p className="text-gray-600 text-sm">Acá para tu necesidad</p>
                     </div>
                   </div>
                 </div>
@@ -132,15 +130,15 @@ export default function AboutScreen({ onBack, onHelp }: AboutScreenProps) {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold mb-3">
-                    Desarrollado por Dillo
+                    Hecho por Dillo
                   </h2>
                   <p className="text-lg leading-relaxed mb-4">
-                    Este sistema ha sido desarrollado por Dillo, una empresa especializada en
-                    soluciones de inteligencia artificial y accesibilidad digital.
+                    Dillo hizo esta aplicación. Dillo trabaja con inteligencia artificial y
+                    tecnología digital.
                   </p>
                   <p className="text-lg leading-relaxed mb-4">
-                    Dillo está comprometida con crear tecnología que mejore la vida de las personas
-                    y construya un mundo más inclusivo.
+                    Dillo quiere mejorar la vida de las personas. Dillo quiere un mundo mejor
+                    para todos.
                   </p>
                   <a
                     href="https://dillo.ai"
@@ -158,7 +156,7 @@ export default function AboutScreen({ onBack, onHelp }: AboutScreenProps) {
 
             <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Información del Sistema
+                Sobre la Aplicación
               </h2>
               <div className="grid sm:grid-cols-2 gap-4 text-gray-700">
                 <div>
@@ -166,28 +164,27 @@ export default function AboutScreen({ onBack, onHelp }: AboutScreenProps) {
                   <p>1.0.0</p>
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900 mb-1">Última actualización</p>
+                  <p className="font-semibold text-gray-900 mb-1">Actualización</p>
                   <p>Febrero 2026</p>
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900 mb-1">Tecnología</p>
-                  <p>IA de reconocimiento de lenguaje de señas</p>
+                  <p className="font-semibold text-gray-900 mb-1">Aplicación</p>
+                  <p>Inteligencia artificial e intérprete de señas</p>
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900 mb-1">Idioma</p>
-                  <p>Español (Lenguaje de Señas)</p>
+                  <p>Español y Señas</p>
                 </div>
               </div>
             </div>
 
             <div className="bg-gray-100 rounded-2xl p-6 sm:p-8 border-2 border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                Agradecimientos
+                Gracias
               </h2>
               <p className="text-gray-700 text-lg leading-relaxed">
-                Agradecemos especialmente a la comunidad sorda que ha colaborado con nosotros
-                en el desarrollo y mejora de este sistema. Sus aportes han sido fundamentales
-                para crear una herramienta verdaderamente útil y accesible.
+                Gracias a las personas sordas que trabajaron con nosotros en esta aplicación.
+                Su ayuda fue muy útil para hacer una herramienta buena para todos.
               </p>
             </div>
           </div>

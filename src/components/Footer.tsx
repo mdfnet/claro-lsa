@@ -11,20 +11,20 @@ export default function Footer() {
                 className="h-8 mb-4 opacity-70"
               />
               <p className="text-sm text-gray-500 mb-4">
-                Tecnología de comunicación accesible desarrollada por Dillo. Facilitando la comunicación para personas sordas.
+                Aplicación de comunicación hecha por Dillo, para personas sordas y personas que no pueden hablar.
               </p>
             </div>
 
             <div>
-              <h3 className="font-bold text-white mb-3">Características</h3>
+              <h3 className="font-bold text-white mb-3">Qué Tenemos</h3>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-[#DA291C] rounded-full"></span>
-                  Síntesis de voz
+                  Aplicación que habla
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-[#DA291C] rounded-full"></span>
-                  Reconocimiento de voz
+                  Aplicación que escucha
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-[#DA291C] rounded-full"></span>
@@ -32,25 +32,25 @@ export default function Footer() {
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-[#DA291C] rounded-full"></span>
-                  Avatar con voz
+                  Avatar que habla
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="font-bold text-white mb-3">Información</h3>
+              <h3 className="font-bold text-white mb-3">Para Ti</h3>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-[#DA291C] rounded-full"></span>
-                  Disponible 24/7
+                  Todos los días para ti
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-[#DA291C] rounded-full"></span>
-                  Diseñado para accesibilidad
+                  Hecho para personas sordas
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-[#DA291C] rounded-full"></span>
-                  Tecnología Dillo.ai
+                  Aplicación Dillo.ai
                 </li>
               </ul>
             </div>

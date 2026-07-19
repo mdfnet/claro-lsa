@@ -114,7 +114,7 @@ export default function ServiceSelectionScreen({ onSelectService }: ServiceSelec
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             <button
-              onClick={() => setIframeModal({ url: 'https://app.dillo.ai/interprete', title: 'Intérprete de Lengua de Señas' })}
+              onClick={() => setIframeModal({ url: 'https://entrenar.dillo.ar/#/traductor', title: 'Intérprete de Lengua de Señas' })}
               className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden md:hover:scale-[1.02] border-4 border-transparent hover:border-[#DA291C]/20 touch-manipulation"
             >
               <div className="p-12 flex flex-col items-center">

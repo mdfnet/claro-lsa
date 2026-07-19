@@ -32,7 +32,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
               No necesitás hablar ni escuchar
             </h3>
             <p className="text-white/90 text-base sm:text-lg">
-              Todo en Dillo es visual: señas, texto grande en pantalla y mensajes que le mostrás a la persona que te atiende.
+              Todo en Dillo es visual: seña, texto grande y mensaje para la persona que te atiende.
             </p>
           </div>
 
@@ -46,7 +46,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
               <div>
                 <h5 className="font-bold text-gray-900 text-lg mb-1">1. Hablo con mis manos</h5>
                 <p className="text-gray-700 text-base leading-relaxed">
-                  Tocá este botón y comunicate en lengua de señas frente a la cámara. Tu seña se convierte en texto y voz para la persona que te atiende.
+                  Tocá este botón y haz tu seña frente a la cámara. Tu seña se convierte en texto y voz para la persona que te atiende.
                 </p>
               </div>
             </div>
@@ -58,7 +58,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
               <div>
                 <h5 className="font-bold text-gray-900 text-lg mb-1">2. Responder con Dillo</h5>
                 <p className="text-gray-700 text-base leading-relaxed">
-                  Tocá este botón para ver la respuesta de la persona traducida a lengua de señas por el avatar de Dillo.
+                  Tocá este botón para ver la respuesta de la persona hecha en seña por el avatar de Dillo.
                 </p>
               </div>
             </div>
@@ -82,7 +82,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
               <div>
                 <h5 className="font-bold text-gray-900 text-lg mb-1">Mostrale la pantalla</h5>
                 <p className="text-gray-700 text-base leading-relaxed">
-                  Después de un toque rápido, girá el celular hacia la persona que te atiende para que lea el mensaje grande en pantalla.
+                  Después de un toque rápido, gira tu teléfono hacia la persona que te atiende para que lea el mensaje grande en pantalla.
                 </p>
               </div>
             </div>
@@ -93,11 +93,11 @@ export default function HelpModal({ onClose }: HelpModalProps) {
             <ul className="space-y-4">
               <li className="flex gap-3">
                 <Camera className="w-6 h-6 text-[#DA291C] flex-shrink-0" strokeWidth={2} />
-                <span className="text-base text-gray-700">Activá el permiso de cámara para poder usar lengua de señas</span>
+                <span className="text-base text-gray-700">Activá la cámara para poder hacer tu seña</span>
               </li>
               <li className="flex gap-3">
                 <Sun className="w-6 h-6 text-[#DA291C] flex-shrink-0" strokeWidth={2} />
-                <span className="text-base text-gray-700">Buscá un lugar con buena luz para que tus señas se vean claras</span>
+                <span className="text-base text-gray-700">Busca brillo para que tu seña se vea clara</span>
               </li>
               <li className="flex gap-3">
                 <Smartphone className="w-6 h-6 text-[#DA291C] flex-shrink-0" strokeWidth={2} />

@@ -10,7 +10,7 @@ export default function Header() {
               <span className="text-amber-500">fly</span>
               <span className="text-gray-800">bondi</span>
             </div>
-            <p className="text-sm text-gray-600 hidden md:block">Comunicación accesible con tecnología Dillo</p>
+            <p className="text-sm text-gray-600 hidden md:block">Comunicación Dillo</p>
           </div>
           <div className="flex items-center gap-2">
             <button className="px-4 py-2 bg-amber-400 text-gray-900 rounded-lg text-sm font-medium hover:bg-amber-500 transition-colors">

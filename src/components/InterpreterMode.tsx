@@ -176,7 +176,7 @@ export default function InterpreterMode({ service, onBack, onHelp, onAbout }: In
                     </h2>
 
                     <p className="text-white text-sm max-w-xs mx-auto drop-shadow-sm">
-                      Usa tu lenguaje de señas y nosotros te entendemos
+                      Haz tu seña y nosotros te entendemos
                     </p>
                   </div>
 
@@ -216,7 +216,7 @@ export default function InterpreterMode({ service, onBack, onHelp, onAbout }: In
                     </h2>
 
                     <p className="text-white text-sm max-w-xs mx-auto drop-shadow-sm">
-                      Nuestras respuestas en tu lenguaje de señas
+                      Nuestra respuesta hecha en tu seña
                     </p>
                   </div>
 

@@ -24,10 +24,10 @@ export default function HelpScreen({ onBack, onAbout }: HelpScreenProps) {
 
           <div className="text-center space-y-4 mb-8">
             <h1 className="text-4xl sm:text-5xl font-bold text-gray-900">
-              Centro de Ayuda
+              Ayuda
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Guía completa para usar nuestro sistema de atención accesible
+              Guía para usar nuestra aplicación de atención
             </p>
           </div>
 
@@ -39,24 +39,24 @@ export default function HelpScreen({ onBack, onAbout }: HelpScreenProps) {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                    ¿Cómo funciona el sistema?
+                    ¿Cómo Funciona?
                   </h2>
                   <p className="text-gray-700 text-lg leading-relaxed mb-3">
-                    Nuestro sistema está diseñado para personas sordas y con discapacidad auditiva.
-                    Utiliza tecnología de reconocimiento de lenguaje de señas para facilitar la comunicación.
+                    Esta aplicación es para personas sordas y personas que no pueden hablar.
+                    Usa inteligencia artificial e intérprete de señas para la comunicación.
                   </p>
                   <ul className="space-y-2 text-gray-700">
                     <li className="flex items-start gap-3">
                       <span className="text-[#DA291C] font-bold">1.</span>
-                      <span>La cámara captura tu lenguaje de señas en tiempo real</span>
+                      <span>La cámara mira tu seña ahora mismo</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="text-[#DA291C] font-bold">2.</span>
-                      <span>El sistema traduce tus señas a texto y voz</span>
+                      <span>La aplicación convierte tu seña en texto y voz</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="text-[#DA291C] font-bold">3.</span>
-                      <span>Las respuestas aparecen en texto grande y fácil de leer</span>
+                      <span>La respuesta aparece en texto grande y fácil de leer</span>
                     </li>
                   </ul>
                 </div>
@@ -73,12 +73,12 @@ export default function HelpScreen({ onBack, onAbout }: HelpScreenProps) {
                     Acciones Rápidas
                   </h2>
                   <p className="text-gray-700 text-lg leading-relaxed mb-3">
-                    Usa los botones grandes para acceder rápidamente a los servicios más comunes:
+                    Usa los botones grandes para tus servicios más usados:
                   </p>
                   <div className="grid sm:grid-cols-2 gap-3">
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="font-semibold text-gray-900 mb-1">Ver catálogo</p>
-                      <p className="text-gray-600 text-sm">Explora todos nuestros celulares disponibles</p>
+                      <p className="text-gray-600 text-sm">Mira todos nuestros teléfonos</p>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="font-semibold text-gray-900 mb-1">Contratar plan</p>
@@ -86,11 +86,11 @@ export default function HelpScreen({ onBack, onAbout }: HelpScreenProps) {
                     </div>
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="font-semibold text-gray-900 mb-1">Ver promociones</p>
-                      <p className="text-gray-600 text-sm">Descubre nuestras ofertas especiales</p>
+                      <p className="text-gray-600 text-sm">Mira nuestras ofertas especiales</p>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="font-semibold text-gray-900 mb-1">Accesorios</p>
-                      <p className="text-gray-600 text-sm">Fundas, cargadores y más</p>
+                      <p className="text-gray-600 text-sm">Todo para tu teléfono</p>
                     </div>
                   </div>
                 </div>
@@ -104,10 +104,10 @@ export default function HelpScreen({ onBack, onAbout }: HelpScreenProps) {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                    Opciones de Accesibilidad
+                    Ayuda Visual
                   </h2>
                   <p className="text-gray-700 text-lg leading-relaxed mb-3">
-                    Personaliza tu experiencia según tus necesidades:
+                    Elige lo que necesitas:
                   </p>
                   <div className="space-y-3">
                     <div className="flex items-start gap-3">
@@ -116,7 +116,7 @@ export default function HelpScreen({ onBack, onAbout }: HelpScreenProps) {
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900">Alto Contraste</p>
-                        <p className="text-gray-600">Aumenta el contraste para mejor visibilidad</p>
+                        <p className="text-gray-600">Todo más claro para ver mejor</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -125,7 +125,7 @@ export default function HelpScreen({ onBack, onAbout }: HelpScreenProps) {
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900">Texto Grande</p>
-                        <p className="text-gray-600">Agranda el texto para facilitar la lectura</p>
+                        <p className="text-gray-600">Texto grande para leer mejor</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -134,7 +134,7 @@ export default function HelpScreen({ onBack, onAbout }: HelpScreenProps) {
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900">Modo Privado</p>
-                        <p className="text-gray-600">Oculta información sensible en la pantalla</p>
+                        <p className="text-gray-600">Oculta lo que no querés mostrar</p>
                       </div>
                     </div>
                   </div>
@@ -149,14 +149,14 @@ export default function HelpScreen({ onBack, onAbout }: HelpScreenProps) {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                    Respuestas con Voz
+                    Escuchar las Respuestas
                   </h2>
                   <p className="text-gray-700 text-lg leading-relaxed">
-                    El sistema puede leer en voz alta las opciones y respuestas. Esto es útil si
-                    hay personas oyentes acompañándote o si deseas usar audífonos.
+                    La aplicación puede leer las respuestas en voz alta. Esto es útil si hay
+                    personas oyentes contigo o si quieres usar auriculares.
                   </p>
                   <p className="text-gray-600 mt-2">
-                    Las voces están configuradas en español latinoamericano neutral para mayor claridad.
+                    Hablamos claro para que entiendas mejor.
                   </p>
                 </div>
               </div>
@@ -164,47 +164,47 @@ export default function HelpScreen({ onBack, onAbout }: HelpScreenProps) {
 
             <div className="bg-gradient-to-r from-[#DA291C] to-[#B01F16] rounded-2xl shadow-lg p-6 sm:p-8 text-white">
               <h2 className="text-2xl font-bold mb-4">
-                Consejos para Mejor Experiencia
+                Para Ayudarte Mejor
               </h2>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <span className="text-2xl">💡</span>
-                  <span className="text-lg">Asegúrate de tener buena iluminación para que la cámara capture bien tus señas</span>
+                  <span className="text-lg">Busca brillo para que la cámara vea bien tu seña</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-2xl">📱</span>
-                  <span className="text-lg">Mantén tu dispositivo estable a la altura del pecho</span>
+                  <span className="text-lg">Mantén tu teléfono estable a la altura del tórax</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-2xl">🖐️</span>
-                  <span className="text-lg">Realiza las señas de forma clara y a una velocidad normal</span>
+                  <span className="text-lg">Haz tu seña de forma clara y normal</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-2xl">✅</span>
-                  <span className="text-lg">Si necesitas repetir, el sistema está diseñado para darte múltiples intentos</span>
+                  <span className="text-lg">Si necesitas, puedes empezar de nuevo las veces que quieras</span>
                 </li>
               </ul>
             </div>
 
             <div className="bg-blue-50 rounded-2xl p-6 sm:p-8 border-2 border-blue-200">
               <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                ¿Necesitas más ayuda?
+                ¿Necesitas Ayuda?
               </h2>
               <p className="text-gray-700 text-lg mb-4">
-                Si tienes dudas o problemas técnicos, nuestro equipo está disponible para asistirte:
+                Si tienes un problema técnico, podemos asistirte:
               </p>
               <div className="space-y-2 text-gray-700">
                 <p className="flex items-center gap-2">
                   <span className="font-semibold">Línea de atención:</span>
-                  <span>*611 desde tu celular Claro</span>
+                  <span>*611 desde tu teléfono Claro</span>
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="font-semibold">WhatsApp:</span>
-                  <span>Escríbenos para soporte en tiempo real</span>
+                  <span>Escríbenos ahora mismo</span>
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="font-semibold">Tiendas físicas:</span>
-                  <span>Visita cualquier punto Claro</span>
+                  <span>Visita nuestra tienda Claro</span>
                 </p>
               </div>
             </div>
