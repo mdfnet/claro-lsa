@@ -165,7 +165,7 @@ export default function AboutScreen({ onBack, onHelp }: AboutScreenProps) {
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900 mb-1">Actualización</p>
-                  <p>Febrero 2026</p>
+                  <p>{new Date().toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}</p>
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900 mb-1">Aplicación</p>

@@ -70,27 +70,27 @@ export default function HelpScreen({ onBack, onAbout }: HelpScreenProps) {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                    Acciones Rápidas
+                    Toques Rápidos
                   </h2>
                   <p className="text-gray-700 text-lg leading-relaxed mb-3">
-                    Usa los botones grandes para tus servicios más usados:
+                    Tocá el botón del servicio que necesitás y el mensaje aparece en pantalla grande para mostrarle a quien te atiende:
                   </p>
                   <div className="grid sm:grid-cols-2 gap-3">
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="font-semibold text-gray-900 mb-1">Ver catálogo</p>
-                      <p className="text-gray-600 text-sm">Mira todos nuestros teléfonos</p>
+                      <p className="font-semibold text-gray-900 mb-1">Pagar mi factura</p>
+                      <p className="text-gray-600 text-sm">Gestiona el pago de tu cuenta Claro</p>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="font-semibold text-gray-900 mb-1">Contratar plan</p>
-                      <p className="text-gray-600 text-sm">Encuentra el plan perfecto para ti</p>
+                      <p className="font-semibold text-gray-900 mb-1">Consultar saldo</p>
+                      <p className="text-gray-600 text-sm">Mirá cuánto saldo tenés disponible</p>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="font-semibold text-gray-900 mb-1">Ver promociones</p>
-                      <p className="text-gray-600 text-sm">Mira nuestras ofertas especiales</p>
+                      <p className="font-semibold text-gray-900 mb-1">Soporte técnico</p>
+                      <p className="text-gray-600 text-sm">Reportá un problema con tu servicio</p>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="font-semibold text-gray-900 mb-1">Accesorios</p>
-                      <p className="text-gray-600 text-sm">Todo para tu teléfono</p>
+                      <p className="font-semibold text-gray-900 mb-1">Y muchos más</p>
+                      <p className="text-gray-600 text-sm">Comprar celular, recargar, cambiar equipo…</p>
                     </div>
                   </div>
                 </div>

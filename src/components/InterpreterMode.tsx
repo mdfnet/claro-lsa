@@ -216,7 +216,7 @@ export default function InterpreterMode({ service, onBack, onHelp, onAbout }: In
                     </h2>
 
                     <p className="text-white text-sm max-w-xs mx-auto drop-shadow-sm">
-                      Nuestra respuesta hecha en tu seña
+                      Nuestra respuesta en señas
                     </p>
                   </div>
 
@@ -238,7 +238,7 @@ export default function InterpreterMode({ service, onBack, onHelp, onAbout }: In
           <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden">
             <div className="bg-gradient-to-r from-[#DA291C] to-[#B01F16] p-4 sm:p-5 md:p-6">
               <h2 className={`text-white font-bold ${largeText ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
-                Accesos Rápidos
+                Toques Rápidos
               </h2>
             </div>
             <div className="p-4 sm:p-5 md:p-6">

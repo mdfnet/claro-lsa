@@ -1,4 +1,4 @@
-import { X, Hand, MessageCircle, Smartphone, Eye, EarOff, Camera, Sun } from 'lucide-react';
+import { X, Hand, MessageCircle, Smartphone, Eye, EarOff, Camera, Sun, Languages } from 'lucide-react';
 
 interface HelpModalProps {
   onClose: () => void;
@@ -37,7 +37,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
           </div>
 
           <div className="space-y-5">
-            <h4 className="text-xl sm:text-2xl font-bold text-gray-900 text-center">3 formas simples de usar Dillo</h4>
+            <h4 className="text-xl sm:text-2xl font-bold text-gray-900 text-center">4 formas simples de usar Dillo</h4>
 
             <div className="flex items-start gap-4 bg-gray-50 rounded-2xl p-5">
               <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#DA291C] rounded-xl flex items-center justify-center flex-shrink-0">
@@ -71,6 +71,18 @@ export default function HelpModal({ onClose }: HelpModalProps) {
                 <h5 className="font-bold text-gray-900 text-lg mb-1">3. Toques Rápidos</h5>
                 <p className="text-gray-700 text-base leading-relaxed">
                   Tocá el botón de lo que necesitás (pagar factura, soporte técnico, etc.). Aparece en letras grandes en la pantalla, lista para mostrar.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 bg-gray-50 rounded-2xl p-5">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#DA291C] rounded-xl flex items-center justify-center flex-shrink-0">
+                <Languages className="w-6 h-6 sm:w-7 sm:h-7 text-white" strokeWidth={2} />
+              </div>
+              <div>
+                <h5 className="font-bold text-gray-900 text-lg mb-1">4. Traducir Página</h5>
+                <p className="text-gray-700 text-base leading-relaxed">
+                  Tocá la burbuja Dillo (abajo a la derecha) o seleccioná el texto de la página. El avatar Dillo lo convierte a lengua de señas para vos.
                 </p>
               </div>
             </div>

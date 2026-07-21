@@ -6,11 +6,11 @@ export default function Header() {
       <div className="px-6 py-4">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center gap-3">
-            <div className="text-2xl font-bold">
-              <span className="text-amber-500">fly</span>
-              <span className="text-gray-800">bondi</span>
-            </div>
-            <p className="text-sm text-gray-600 hidden md:block">Comunicación Dillo</p>
+            <img
+              src="https://www.claro.com.ar/static/claro-logo-red-atlas-2.svg"
+              alt="Claro"
+              className="h-7"
+            />
           </div>
           <div className="flex items-center gap-2">
             <button className="px-4 py-2 bg-amber-400 text-gray-900 rounded-lg text-sm font-medium hover:bg-amber-500 transition-colors">
