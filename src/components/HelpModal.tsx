@@ -37,7 +37,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
           </div>
 
           <div className="space-y-5">
-            <h4 className="text-xl sm:text-2xl font-bold text-gray-900 text-center">4 formas simples de usar Dillo</h4>
+            <h4 className="text-xl sm:text-2xl font-bold text-gray-900 text-center">4 formas de usar Dillo</h4>
 
             <div className="flex items-start gap-4 bg-gray-50 rounded-2xl p-5">
               <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#DA291C] rounded-xl flex items-center justify-center flex-shrink-0">
