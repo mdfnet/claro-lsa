@@ -176,7 +176,7 @@ export default function ServiceSelectionScreen({ onSelectService }: ServiceSelec
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Toques Rápidos</h3>
-              <p className="text-gray-600">Accede a servicios de telefonía con un toque</p>
+              <p className="text-gray-600">Accede a los servicios con un toque</p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">

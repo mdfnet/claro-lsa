@@ -9,9 +9,14 @@ interface IframeModalProps {
 
 export default function IframeModal({ url, title, onClose }: IframeModalProps) {
   useEffect(() => {
-    window.DilloInterpreter?.unmount();
+    const widget = document.querySelector('dillo-interpreter');
+    const hadWidget = widget !== null;
+    widget?.remove();
+
     return () => {
-      window.DilloInterpreter?.mount();
+      if (hadWidget && !document.querySelector('dillo-interpreter')) {
+        document.body.appendChild(document.createElement('dillo-interpreter'));
+      }
     };
   }, []);
 

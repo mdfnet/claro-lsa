@@ -21,6 +21,11 @@
     user-select: none;
   }
 
+  /* Keeps the Dillo widget's hover-to-sign popup from targeting button labels */
+  button * {
+    pointer-events: none;
+  }
+
   html {
     overflow-x: hidden;
     height: 100%;

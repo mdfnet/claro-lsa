@@ -46,7 +46,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
               <div>
                 <h5 className="font-bold text-gray-900 text-lg mb-1">1. Hablo con mis manos</h5>
                 <p className="text-gray-700 text-base leading-relaxed">
-                  Tocá este botón y haz tu seña frente a la cámara. Tu seña se convierte en texto y voz para la persona que te atiende.
+                  Accedé y hace tu seña a la cámara. Tu seña se convierte en texto y voz para la persona que te atiende.
                 </p>
               </div>
             </div>
@@ -58,7 +58,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
               <div>
                 <h5 className="font-bold text-gray-900 text-lg mb-1">2. Responder con Dillo</h5>
                 <p className="text-gray-700 text-base leading-relaxed">
-                  Tocá este botón para ver la respuesta de la persona hecha en seña por el avatar de Dillo.
+                  Accedé para ver la respuesta de la persona hecha en seña por Dillo.
                 </p>
               </div>
             </div>
@@ -70,7 +70,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
               <div>
                 <h5 className="font-bold text-gray-900 text-lg mb-1">3. Toques Rápidos</h5>
                 <p className="text-gray-700 text-base leading-relaxed">
-                  Tocá el botón de lo que necesitás (pagar factura, soporte técnico, etc.). Aparece en letras grandes en la pantalla, lista para mostrar.
+                  Tocá el servicio que necesitás (pagar factura, comprar un celular, etc.). Aparece en letras grandes en la pantalla, lista para la persona que te atiende.
                 </p>
               </div>
             </div>
@@ -80,9 +80,9 @@ export default function HelpModal({ onClose }: HelpModalProps) {
                 <Languages className="w-6 h-6 sm:w-7 sm:h-7 text-white" strokeWidth={2} />
               </div>
               <div>
-                <h5 className="font-bold text-gray-900 text-lg mb-1">4. Traducir Página</h5>
+                <h5 className="font-bold text-gray-900 text-lg mb-1">4. Traducir Página web</h5>
                 <p className="text-gray-700 text-base leading-relaxed">
-                  Tocá la burbuja Dillo (abajo a la derecha) o seleccioná el texto de la página. El avatar Dillo lo convierte a lengua de señas para vos.
+                  Podés tocar abajo o seleccionar el texto de la pagina web. Dillo lo convierte a lengua de señas.
                 </p>
               </div>
             </div>
@@ -94,7 +94,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
               <div>
                 <h5 className="font-bold text-gray-900 text-lg mb-1">Mostrale la pantalla</h5>
                 <p className="text-gray-700 text-base leading-relaxed">
-                  Después de un toque rápido, gira tu teléfono hacia la persona que te atiende para que lea el mensaje grande en pantalla.
+                  Luego de un toque rápido mostrale la pantalla a la persona que te atiende para que vea el mensaje en pantalla grande.
                 </p>
               </div>
             </div>
@@ -113,7 +113,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
               </li>
               <li className="flex gap-3">
                 <Smartphone className="w-6 h-6 text-[#DA291C] flex-shrink-0" strokeWidth={2} />
-                <span className="text-base text-gray-700">Los Toques Rápidos te ahorran tiempo: un solo toque y ya está listo para mostrar</span>
+                <span className="text-base text-gray-700">Los toques rápidos ahorran tiempo. un solo toque y listo para mostrar la pantalla</span>
               </li>
             </ul>
           </div>

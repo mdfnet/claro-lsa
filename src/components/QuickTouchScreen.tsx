@@ -91,7 +91,7 @@ export default function QuickTouchScreen({ title, speech, icon: Icon, onClose }:
         <div className="flex items-center gap-3 text-gray-500">
           {Icon && <Icon className="w-6 h-6 sm:w-7 sm:h-7" />}
           <p className="text-lg sm:text-xl font-medium">
-            Mostrale esta pantalla a la persona que te está atendiendo
+            Mostrale la pantalla a la persona que te atiende
           </p>
         </div>
 
