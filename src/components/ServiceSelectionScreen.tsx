@@ -112,7 +112,38 @@ export default function ServiceSelectionScreen({ onSelectService }: ServiceSelec
 
       <div className="flex-1 overflow-y-auto px-6 py-12" style={{ WebkitOverflowScrolling: 'touch' }}>
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-12">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Toques Rápidos</h3>
+              <p className="text-gray-600">Accede a los servicios con un toque</p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {quickTouchServices.map((service) => {
+                const Icon = service.icon;
+                return (
+                  <button
+                    key={service.id}
+                    onClick={() => {
+                      setActiveQuickTouch({ title: service.title, speech: service.speech, icon: Icon });
+                    }}
+                    className="group bg-gray-50 hover:bg-[#DA291C] border-2 border-gray-200 hover:border-[#DA291C] rounded-xl p-6 transition-all duration-300 hover:shadow-lg md:hover:scale-[1.02] touch-manipulation"
+                  >
+                    <div className="flex flex-col items-center text-center gap-3">
+                      <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+                        <Icon className="w-7 h-7 text-[#DA291C]" strokeWidth={2} />
+                      </div>
+                      <p className="text-sm font-semibold text-gray-900 group-hover:text-white transition-colors">
+                        {service.title}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <button
               onClick={() => setIframeModal({ url: `https://entrenar.dillo.ar/#/traductor?model=/models/Modelo_Claro_LSA.json&t=${Date.now()}`, title: 'Intérprete de Lengua de Señas' })}
               className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden md:hover:scale-[1.02] border-4 border-transparent hover:border-[#DA291C]/20 touch-manipulation"
@@ -171,37 +202,6 @@ export default function ServiceSelectionScreen({ onSelectService }: ServiceSelec
                 </div>
               </div>
             </button>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Toques Rápidos</h3>
-              <p className="text-gray-600">Accede a los servicios con un toque</p>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {quickTouchServices.map((service) => {
-                const Icon = service.icon;
-                return (
-                  <button
-                    key={service.id}
-                    onClick={() => {
-                      setActiveQuickTouch({ title: service.title, speech: service.speech, icon: Icon });
-                    }}
-                    className="group bg-gray-50 hover:bg-[#DA291C] border-2 border-gray-200 hover:border-[#DA291C] rounded-xl p-6 transition-all duration-300 hover:shadow-lg md:hover:scale-[1.02] touch-manipulation"
-                  >
-                    <div className="flex flex-col items-center text-center gap-3">
-                      <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
-                        <Icon className="w-7 h-7 text-[#DA291C]" strokeWidth={2} />
-                      </div>
-                      <p className="text-sm font-semibold text-gray-900 group-hover:text-white transition-colors">
-                        {service.title}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
           </div>
         </div>
         <Footer />
