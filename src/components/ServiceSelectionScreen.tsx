@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Hand, MessageCircle, Smartphone, CreditCard, Headphones, FileText, HelpCircle, Wifi, ShoppingCart, DollarSign, PhoneCall, Signal, Package, RefreshCw, AlertCircle } from 'lucide-react';
+import { useBackHandler } from '../hooks/useBackHandler';
 import Footer from './Footer';
 import HelpModal from './HelpModal';
 import IframeModal from './IframeModal';
@@ -13,6 +14,10 @@ export default function ServiceSelectionScreen({ onSelectService }: ServiceSelec
   const [showHelp, setShowHelp] = useState(false);
   const [iframeModal, setIframeModal] = useState<{ url: string; title: string } | null>(null);
   const [activeQuickTouch, setActiveQuickTouch] = useState<{ title: string; speech: string; icon: any } | null>(null);
+
+  useBackHandler(showHelp, () => setShowHelp(false));
+  useBackHandler(iframeModal !== null, () => setIframeModal(null));
+  useBackHandler(activeQuickTouch !== null, () => setActiveQuickTouch(null));
 
   const quickTouchServices = [
     {
