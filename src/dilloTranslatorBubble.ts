@@ -22,27 +22,46 @@ const STYLE_ID = 'claro-traductor-bubble';
  *  (WCAG 2.5.3, "Label in Name"). */
 const ARIA_LABEL = 'Traductor de lengua de señas Dillo';
 
+// El FAB original queda invisible pero en el DOM para poder clickearlo por JS.
+// El panel y sus botones se repintan con el rojo Claro sobreescribiendo el azul.
+// Los selectores son amplios porque no tenemos acceso a los nombres internos.
 const STYLES = `
 .dillo-fab {
-  width: auto;
-  height: 56px;
-  padding: 0 20px 0 16px;
-  gap: 10px;
-  border-radius: 28px;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
 }
 
-.dillo-fab img {
-  height: 24px;
+/* Override azul de Dillo → rojo Claro */
+button:not(.dillo-fab),
+[class*="button"]:not(.dillo-fab),
+[class*="btn"]:not(.dillo-fab),
+[class*="send"],
+[class*="submit"],
+[class*="primary"],
+[class*="action"] {
+  background-color: #DA291C !important;
+  border-color: #DA291C !important;
+  color: #fff !important;
 }
 
-.dillo-fab::after {
-  content: "Traductor";
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1;
-  color: #fff;
-  white-space: nowrap;
+[class*="header"],
+[class*="toolbar"],
+[class*="topbar"],
+[class*="navbar"] {
+  background-color: #DA291C !important;
+  color: #fff !important;
+}
+
+a, [class*="link"] {
+  color: #DA291C !important;
 }
 `;
 
