@@ -10,12 +10,20 @@ interface IframeModalProps {
 export default function IframeModal({ url, title, onClose }: IframeModalProps) {
   useEffect(() => {
     const widget = document.querySelector('dillo-interpreter');
-    const hadWidget = widget !== null;
+    // Guardamos la configuración del plugin (por ejemplo brand-logo, el ícono de
+    // la burbuja) porque al recrearlo hay que devolvérsela: el plugin lee sus
+    // atributos una sola vez, en connectedCallback, y sin ellos vuelve a los
+    // valores por defecto.
+    const attributes = widget
+      ? Array.from(widget.attributes).map((attr) => [attr.name, attr.value] as const)
+      : null;
     widget?.remove();
 
     return () => {
-      if (hadWidget && !document.querySelector('dillo-interpreter')) {
-        document.body.appendChild(document.createElement('dillo-interpreter'));
+      if (attributes && !document.querySelector('dillo-interpreter')) {
+        const restored = document.createElement('dillo-interpreter');
+        attributes.forEach(([name, value]) => restored.setAttribute(name, value));
+        document.body.appendChild(restored);
       }
     };
   }, []);

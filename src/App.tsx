@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useBackButtonNavigation, useBackHandler } from './hooks/useBackHandler';
 import WelcomeScreen from './components/WelcomeScreen';
 import ServiceSelectionScreen from './components/ServiceSelectionScreen';
 import InterpreterMode from './components/InterpreterMode';
@@ -10,6 +11,12 @@ type Screen = 'welcome' | 'services' | 'interpreter' | 'help' | 'about';
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
   const [selectedService, setSelectedService] = useState<string>('');
+
+  useBackButtonNavigation();
+
+  useBackHandler(currentScreen !== 'welcome', () => {
+    setCurrentScreen(currentScreen === 'interpreter' ? 'services' : 'welcome');
+  });
 
   const handleStart = () => {
     setCurrentScreen('services');
