@@ -6,6 +6,35 @@ necesita, la app lo muestra en pantalla grande y lo reproduce en voz para quien
 atiende. La traducción a lengua de señas la aporta el plugin de
 [Dillo](https://dillo.ai).
 
+## Estado de los pedidos
+
+Numerados igual que la lista que pasó Pedro, para poder cruzarlos.
+
+| # | Pedido | Estado |
+| --- | --- | --- |
+| 1 | Grabación de audio en el avatar | Pendiente — **no es de este repo** |
+| 2 | Toques rápidos antes de los accesos a Dillo | ✅ Hecho |
+| 3 | Botón para cambiar entre modos sin volver atrás | Pendiente |
+| 4 | Botón "atrás" del celular | ✅ Hecho |
+| 5 | Subopciones dentro de los toques rápidos | Pendiente |
+| 6 | Analytics | Pendiente — falta definir qué medir |
+| 7 | Ícono de la burbuja del plugin | ✅ Hecho |
+
+Aclaraciones sobre los pendientes:
+
+- **(1)** La grabación de audio vive en el avatar y en el panel del plugin, no en
+  esta app. Hay que pedirlo del lado de `plugin-handsign` / avatar.
+- **(3)** Los dos modos son iframes que abre `IframeModal`. Cambiar entre uno y
+  otro es cambiar la URL del iframe, así que se resuelve dentro de ese componente.
+- **(5)** El toque rápido **"Ver planes" ya existe** (junto con "Cambiar de
+  equipo"). Lo que falta son las subopciones adentro de cada uno, no el acceso.
+
+Además, sin estar en la lista:
+
+- Se arregló que `IframeModal` perdiera la configuración del plugin al cerrarse
+  (ver más abajo).
+- Se actualizaron dependencias transitivas con `npm audit fix`.
+
 ## Cómo correrlo
 
 ```bash
@@ -20,9 +49,40 @@ raíz).
 | --- | --- |
 | `npm run dev` | Servidor de desarrollo |
 | `npm run build` | Build de producción en `dist/` |
+| `npm run build:dev` | Build para `/claro/dev/` en `dist-dev/` (ver Publicación) |
 | `npm run preview` | Sirve el build ya generado |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
+
+## Publicación
+
+> El `base` queda **clavado dentro de los assets** al compilar. Si subís un build
+> a una carpeta distinta de la que se compiló, el navegador pide los archivos en
+> la ruta vieja y la página queda en blanco (o peor: carga los assets de
+> producción).
+
+Producción, en `claro/`:
+
+```bash
+npm run build          # deja todo en dist/
+```
+
+Copia de prueba, en `claro/dev/`, para mostrar cambios sin tocar producción:
+
+```bash
+npm run build:dev      # deja todo en dist-dev/
+```
+
+En los dos casos se sube **el contenido** de la carpeta, no la carpeta. Para
+cualquier otra ruta:
+
+```bash
+BASE_PATH=/la/ruta/ npm run build
+```
+
+**El sitio tiene que servirse por HTTPS.** El intérprete usa la cámara, y los
+navegadores la bloquean si la página que contiene el iframe viaja por HTTP
+plano, aunque el iframe venga de un origen seguro.
 
 ## Estructura
 
