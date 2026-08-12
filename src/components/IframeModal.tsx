@@ -1,5 +1,6 @@
 import { X, Hand, MessageCircle } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useBackHandler } from '../hooks/useBackHandler';
 
 interface IframeModalProps {
   initialMode: 'hands' | 'dillo';
@@ -10,12 +11,19 @@ interface IframeModalProps {
 function getHandsUrl() {
   return `https://entrenar.dillo.ar/#/traductor?model=/models/Modelo_Claro_LSA.json&t=${Date.now()}`;
 }
-const DILLO_URL = 'https://avatar.dillo.ai';
+const DILLO_URL = 'https://avatar.dillo.ai/?embed=1';
 
 export default function IframeModal({ initialMode, onClose }: IframeModalProps) {
   const [activeMode, setActiveMode] = useState<'hands' | 'dillo'>(initialMode);
+  const [isClosing, setIsClosing] = useState(false);
   // Generamos la URL de señas una sola vez al montar, para no regenerar el timestamp al cambiar de modo.
   const handsUrl = useRef(getHandsUrl()).current;
+
+  const requestClose = useCallback(() => {
+    setIsClosing(true);
+  }, []);
+
+  useBackHandler(true, requestClose);
 
   useEffect(() => {
     const widget = document.querySelector('dillo-interpreter');
@@ -37,7 +45,10 @@ export default function IframeModal({ initialMode, onClose }: IframeModalProps) 
   const iframeTitle = activeMode === 'hands' ? 'Intérprete de Lengua de Señas' : 'Avatar Dillo';
 
   return (
-    <div className="fixed inset-0 bg-white z-50 animate-fade-in flex flex-col">
+    <div
+      className={`fixed inset-0 bg-white z-50 flex flex-col ${isClosing ? 'opacity-0 pointer-events-none' : 'animate-fade-in'} transition-opacity duration-150`}
+      onTransitionEnd={() => { if (isClosing) onClose(); }}
+    >
       {/* Barra superior con toggle de modo y botón de cierre */}
       <div className="flex-shrink-0 bg-white border-b border-gray-200 flex items-center justify-between px-4 py-3 gap-4">
 
@@ -63,13 +74,13 @@ export default function IframeModal({ initialMode, onClose }: IframeModalProps) 
             }`}
           >
             <MessageCircle className="w-4 h-4" strokeWidth={2.5} />
-            Dillo
+            Responder con Dillo
           </button>
         </div>
 
         {/* Botón de cierre */}
         <button
-          onClick={onClose}
+          onClick={requestClose}
           aria-label="Volver al inicio"
           className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-800 font-semibold px-4 py-2.5 rounded-xl transition-colors touch-manipulation"
         >

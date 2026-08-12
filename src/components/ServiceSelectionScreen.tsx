@@ -120,7 +120,7 @@ export default function ServiceSelectionScreen({ onSelectService: _onSelectServi
   const [phoneValue, setPhoneValue] = useState('');
 
   useBackHandler(showHelp, () => setShowHelp(false));
-  useBackHandler(iframeModal !== null, () => setIframeModal(null));
+  // El cierre del IframeModal lo maneja el propio componente con animación de salida.
   useBackHandler(activeQuickTouch !== null, () => setActiveQuickTouch(null));
   useBackHandler(activeSuboptions !== null, () => setActiveSuboptions(null));
   useBackHandler(showModeSelector, () => setShowModeSelector(false));

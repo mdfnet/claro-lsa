@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useBackButtonNavigation, useBackHandler } from './hooks/useBackHandler';
 import WelcomeScreen from './components/WelcomeScreen';
 import VolumeReminderScreen from './components/VolumeReminderScreen';
@@ -91,10 +91,18 @@ function DilloBubbleControl() {
   );
 }
 
+function useThemeColor(color: string) {
+  useEffect(() => {
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color);
+  }, [color]);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
+
+  useThemeColor(currentScreen === 'welcome' ? '#DA291C' : '#ffffff');
 
   useBackButtonNavigation();
 
