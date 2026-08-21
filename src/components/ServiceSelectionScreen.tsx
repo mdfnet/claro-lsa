@@ -100,6 +100,7 @@ const CARD_CLASS =
 
 export default function ServiceSelectionScreen({ onSelectService: _onSelectService }: ServiceSelectionScreenProps) {
   const [showHelp, setShowHelp] = useState(false);
+  const [avatarOn, setAvatarOn] = useState(false);
   const [iframeModal, setIframeModal] = useState<{ initialMode: 'hands' | 'dillo' } | null>(null);
   const [activeQuickTouch, setActiveQuickTouch] = useState<{
     title: string;
@@ -305,14 +306,38 @@ export default function ServiceSelectionScreen({ onSelectService: _onSelectServi
               alt="Claro"
               className="h-6 sm:h-8"
             />
-            <button
-              onClick={() => setShowHelp(true)}
-              className="px-3 py-2 sm:px-5 sm:py-2.5 bg-[#DA291C] active:bg-[#B01F16] text-white rounded-full text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 touch-manipulation flex-shrink-0"
-            >
-              <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-              <span className="hidden xs:inline sm:inline">¿Cómo usar Dillo?</span>
-              <span className="xs:hidden sm:hidden">Ayuda</span>
-            </button>
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              {/* Switch on/off del avatar de señas */}
+              <button
+                onClick={() => setAvatarOn((v) => !v)}
+                role="switch"
+                aria-checked={avatarOn}
+                aria-label={avatarOn ? 'Apagar traductor de señas' : 'Prender traductor de señas'}
+                className="flex items-center gap-2 touch-manipulation"
+              >
+                <span className="hidden sm:inline text-xs sm:text-sm font-medium text-gray-600">Dillo Intérprete</span>
+                <span
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
+                    avatarOn ? 'bg-[#DA291C]' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-200 ${
+                      avatarOn ? 'translate-x-5' : 'translate-x-0.5'
+                    }`}
+                  />
+                </span>
+              </button>
+
+              <button
+                onClick={() => setShowHelp(true)}
+                className="px-3 py-2 sm:px-5 sm:py-2.5 bg-[#DA291C] active:bg-[#B01F16] text-white rounded-full text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 touch-manipulation flex-shrink-0"
+              >
+                <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="hidden xs:inline sm:inline">¿Cómo usar Dillo?</span>
+                <span className="xs:hidden sm:hidden">Ayuda</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -320,6 +345,10 @@ export default function ServiceSelectionScreen({ onSelectService: _onSelectServi
       {/* ── Contenido scrolleable ────────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto px-3 py-4 sm:px-5 sm:py-6 md:px-6 md:py-8" style={{ WebkitOverflowScrolling: 'touch' }}>
         <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6 md:space-y-8">
+
+          {/* Plugin Dillo (avatar LSA): vive solo en la pantalla de Toques Rápidos.
+              Se monta/desmonta con el switch on/off del header. */}
+          {avatarOn && <dillo-avatar-widget lang="lsa"></dillo-avatar-widget>}
 
           {/* Grilla de Toques Rápidos */}
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8">
