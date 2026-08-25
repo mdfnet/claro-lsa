@@ -11,6 +11,8 @@ dist
 dist-dev
 dist-ssr
 *.local
+backup/
+build dev/
 
 .vscode/*
 !.vscode/extensions.json

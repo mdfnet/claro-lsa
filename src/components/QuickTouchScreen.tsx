@@ -1,95 +1,79 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Check, RotateCcw, Volume2 } from 'lucide-react';
+import { Check, RotateCcw, Volume2, MessageSquare } from 'lucide-react';
 
 interface QuickTouchScreenProps {
   title: string;
   speech: string;
-  icon: any;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   onClose: () => void;
   parentTitle?: string;
   phoneNumber?: string;
+  // Personalización del botón principal (usado por TextResponseMode)
   closeLabel?: string;
   closeIcon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  // false cuando vive dentro de otra pantalla que ya tiene su propio chrome (por
-  // ejemplo la barra de modos de IframeModal) y no debe taparlo con un overlay
-  // a pantalla completa.
+  // false cuando vive dentro de otra pantalla (ej: TextResponseMode dentro de IframeModal)
   fullScreen?: boolean;
+  // true: agrega banner de turno y botón "Asesor respondé acá" (flujo de Toques Rápidos)
+  showConversation?: boolean;
+  // Abre el modal de respuesta del asesor encima de esta pantalla (sin cerrarla)
+  onOpenReplyModal?: () => void;
 }
 
 const BAR_COUNT = 5;
 
 export default function QuickTouchScreen({
-  title, speech, icon: _Icon, onClose, parentTitle, phoneNumber,
-  closeLabel = 'Listo', closeIcon: CloseIcon = Check, fullScreen = true,
+  title, speech, icon: _Icon, onClose,
+  parentTitle, phoneNumber,
+  closeLabel = 'Listo', closeIcon: CloseIcon = Check,
+  fullScreen = true,
+  showConversation = false,
+  onOpenReplyModal,
 }: QuickTouchScreenProps) {
   const [isSpeaking, setIsSpeaking] = useState(false);
 
+  // Solo prevenimos pull-to-refresh en modo fullscreen
   useEffect(() => {
-    const { body, documentElement: html } = document;
-    const prevBodyOverflow = body.style.overflow;
-    const prevHtmlOverflow = html.style.overflow;
-    const prevOverscroll = html.style.overscrollBehavior;
-
-    body.style.overflow = 'hidden';
-    html.style.overflow = 'hidden';
+    if (!fullScreen) return;
+    const { documentElement: html } = document;
+    const prev = html.style.overscrollBehavior;
     html.style.overscrollBehavior = 'none';
-
-    return () => {
-      body.style.overflow = prevBodyOverflow;
-      html.style.overflow = prevHtmlOverflow;
-      html.style.overscrollBehavior = prevOverscroll;
-    };
-  }, []);
+    return () => { html.style.overscrollBehavior = prev; };
+  }, [fullScreen]);
 
   const playSpeech = useCallback(() => {
     if (!('speechSynthesis' in window)) return;
-
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(speech);
     const voices = window.speechSynthesis.getVoices();
 
-    const latinAmericanVoice = voices.find(voice =>
-      (voice.lang.startsWith('es-419') ||
-       voice.lang.startsWith('es-MX') ||
-       voice.lang.startsWith('es-AR') ||
-       voice.lang.startsWith('es-CO') ||
-       voice.lang.startsWith('es-CL') ||
-       voice.lang.startsWith('es-VE') ||
-       voice.lang.startsWith('es-PE') ||
-       voice.lang.startsWith('es-UY')) &&
-      !voice.name.toLowerCase().includes('spain') &&
-      !voice.name.toLowerCase().includes('españa')
+    const latinAmericanVoice = voices.find((v) =>
+      (v.lang.startsWith('es-419') || v.lang.startsWith('es-MX') ||
+       v.lang.startsWith('es-AR') || v.lang.startsWith('es-CO') ||
+       v.lang.startsWith('es-CL') || v.lang.startsWith('es-VE') ||
+       v.lang.startsWith('es-PE') || v.lang.startsWith('es-UY')) &&
+      !v.name.toLowerCase().includes('spain') &&
+      !v.name.toLowerCase().includes('españa')
     );
-
-    const neutralSpanishVoice = latinAmericanVoice || voices.find(voice =>
-      voice.lang.startsWith('es') &&
-      !voice.lang.startsWith('es-ES') &&
-      !voice.name.toLowerCase().includes('spain') &&
-      !voice.name.toLowerCase().includes('españa')
+    const neutralVoice = latinAmericanVoice || voices.find((v) =>
+      v.lang.startsWith('es') && !v.lang.startsWith('es-ES') &&
+      !v.name.toLowerCase().includes('spain') && !v.name.toLowerCase().includes('españa')
     );
-
-    const fallbackVoice = neutralSpanishVoice || voices.find(voice => voice.lang.startsWith('es'));
-
-    if (fallbackVoice) {
-      utterance.voice = fallbackVoice;
-    }
+    const fallback = neutralVoice || voices.find((v) => v.lang.startsWith('es'));
+    if (fallback) utterance.voice = fallback;
 
     utterance.lang = 'es-419';
     utterance.rate = 0.85;
     utterance.pitch = 1.0;
     utterance.volume = 1;
-
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
-
     window.speechSynthesis.speak(utterance);
   }, [speech]);
 
   useEffect(() => {
     playSpeech();
-
     return () => {
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
@@ -98,86 +82,113 @@ export default function QuickTouchScreen({
 
   return (
     <div className={`${fullScreen ? 'fixed inset-0 z-[60]' : 'w-full h-full'} bg-white flex flex-col animate-fade-in`}>
-      <div className="flex-1 overflow-y-auto flex flex-col items-center justify-center px-6 py-4 sm:px-10 sm:py-6 text-center gap-5 sm:gap-10" style={{ WebkitOverflowScrolling: 'touch' }}>
-        <div className="flex flex-col items-center gap-2 text-gray-500">
+
+      {/* Banner de turno — solo en flujo de conversación */}
+      {showConversation && (
+        <div className="bg-[#DA291C] text-white text-center py-2.5 px-4 text-sm sm:text-base font-semibold flex-shrink-0">
+          Mostrá esta pantalla al asesor
+        </div>
+      )}
+
+      {/*
+        Patrón correcto para "centrado cuando entra, scrolleable cuando no":
+        - Outer: overflow-y-auto (scroll solo si el contenido no entra)
+        - Inner: min-h-full + justify-center
+      */}
+      <div className="flex-1 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="min-h-full flex flex-col items-center justify-center px-6 py-6 sm:px-10 sm:py-8 text-center gap-5 sm:gap-8">
+
           {parentTitle && (
-            <p className="text-2xl sm:text-3xl font-bold text-[#DA291C]">
-              {parentTitle}
-            </p>
+            <p className="text-2xl sm:text-3xl font-bold text-[#DA291C]">{parentTitle}</p>
           )}
-          <p className="text-base sm:text-xl font-medium">
-            Mostrale la pantalla a la persona que te atiende
-          </p>
-        </div>
 
-        <div className="bg-gray-50 border-4 border-[#DA291C] rounded-3xl px-6 py-7 sm:px-16 sm:py-14 max-w-3xl shadow-lg w-full">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-[#DA291C] leading-tight">
-            {title}
-          </h1>
-          {phoneNumber && (
-            <div className="mt-5 pt-5 sm:mt-6 sm:pt-6 border-t-2 border-[#DA291C]/20 flex flex-col gap-1">
-              <p className="text-sm sm:text-base font-medium text-gray-500">Número de línea</p>
-              <p className="text-3xl sm:text-4xl font-black text-gray-900 tracking-wide">{phoneNumber}</p>
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col items-center gap-2 sm:gap-3">
-          <div
-            className={`relative w-14 h-14 sm:w-24 sm:h-24 rounded-full flex items-center justify-center transition-colors duration-300 ${
-              isSpeaking ? 'bg-[#DA291C]' : 'bg-gray-200'
-            }`}
-          >
-            {isSpeaking && (
-              <>
-                <span className="absolute inset-0 rounded-full bg-[#DA291C]/40 animate-ping" />
-                <span className="absolute -inset-2 rounded-full border-2 border-[#DA291C]/30 animate-pulse" />
-              </>
+          {/* Mensaje principal */}
+          <div className="bg-gray-50 border-4 border-[#DA291C] rounded-3xl px-6 py-7 sm:px-16 sm:py-14 max-w-3xl shadow-lg w-full">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 leading-tight">
+              {title}
+            </h1>
+            {phoneNumber && (
+              <div className="mt-5 pt-5 sm:mt-6 sm:pt-6 border-t-2 border-[#DA291C]/20 flex flex-col gap-1">
+                <p className="text-sm sm:text-base font-medium text-gray-500">Número de línea</p>
+                <p className="text-3xl sm:text-4xl font-black text-gray-900 tracking-wide">{phoneNumber}</p>
+              </div>
             )}
-            <Volume2
-              className={`w-7 h-7 sm:w-10 sm:h-10 relative z-10 transition-colors duration-300 ${
-                isSpeaking ? 'text-white' : 'text-gray-500'
+          </div>
+
+          {/* Indicador de audio */}
+          <div className="flex flex-col items-center gap-2 sm:gap-3">
+            <div
+              className={`relative w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                isSpeaking ? 'bg-[#DA291C]' : 'bg-gray-200'
               }`}
-            />
-          </div>
-
-          <div className="flex items-end gap-1 h-6 sm:h-8">
-            {Array.from({ length: BAR_COUNT }).map((_, i) => (
-              <div
-                key={i}
-                className={`w-1.5 sm:w-2 h-6 sm:h-8 rounded-full origin-bottom transition-colors duration-300 ${
-                  isSpeaking ? 'bg-[#DA291C] animate-sound-wave' : 'bg-gray-300'
+            >
+              {isSpeaking && (
+                <>
+                  <span className="absolute inset-0 rounded-full bg-[#DA291C]/40 animate-ping" />
+                  <span className="absolute -inset-2 rounded-full border-2 border-[#DA291C]/30 animate-pulse" />
+                </>
+              )}
+              <Volume2
+                className={`w-7 h-7 sm:w-9 sm:h-9 relative z-10 transition-colors duration-300 ${
+                  isSpeaking ? 'text-white' : 'text-gray-500'
                 }`}
-                style={isSpeaking ? { animationDelay: `${i * 0.12}s` } : { transform: 'scaleY(0.25)' }}
               />
-            ))}
+            </div>
+
+            <div className="flex items-end gap-1 h-5 sm:h-7">
+              {Array.from({ length: BAR_COUNT }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-1.5 sm:w-2 h-5 sm:h-7 rounded-full origin-bottom transition-colors duration-300 ${
+                    isSpeaking ? 'bg-[#DA291C] animate-sound-wave' : 'bg-gray-300'
+                  }`}
+                  style={isSpeaking ? { animationDelay: `${i * 0.12}s` } : { transform: 'scaleY(0.25)' }}
+                />
+              ))}
+            </div>
+
+            <p className="text-sm sm:text-base text-gray-500 font-medium">
+              {isSpeaking ? 'Reproduciendo…' : 'Mensaje reproducido'}
+            </p>
           </div>
 
-          <p className="text-sm sm:text-base text-gray-500 font-medium">
-            {isSpeaking ? 'Escuchando...' : 'Mensaje reproducido'}
-          </p>
-
-          <div className="mt-1 sm:mt-4 flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
+          {/* Botones de acción */}
+          <div className="flex flex-col items-center gap-3 w-full max-w-md">
             <button
               onClick={playSpeech}
-              className="bg-white border-2 border-[#DA291C] text-[#DA291C] hover:bg-[#DA291C]/5 active:bg-[#DA291C]/10
-                       px-6 py-3 sm:px-8 sm:py-5 rounded-2xl text-base sm:text-xl font-semibold transition-colors duration-200
-                       flex items-center gap-2 sm:gap-3 touch-manipulation"
+              className="w-full bg-white border-2 border-[#DA291C] text-[#DA291C] active:bg-[#DA291C]/10
+                       py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-semibold transition-colors
+                       flex items-center justify-center gap-2 touch-manipulation"
             >
-              <RotateCcw className="w-4 h-4 sm:w-6 sm:h-6" />
-              <span>Volver a reproducir</span>
+              <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
+              Volver a reproducir
             </button>
+
+            {/* Botón para que el asesor responda — aparece siempre que haya callback,
+                tanto en Toques Rápidos (fullscreen) como en Responder con texto (dentro de IframeModal) */}
+            {onOpenReplyModal && (
+              <button
+                onClick={onOpenReplyModal}
+                className="w-full bg-gray-800 active:bg-gray-900 text-white
+                           py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-bold transition-colors shadow-lg
+                           flex items-center justify-center gap-2 touch-manipulation"
+              >
+                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+                Asesor: respondé con Dillo →
+              </button>
+            )}
 
             <button
               onClick={onClose}
-              className="bg-[#DA291C] hover:bg-[#B01F16] active:bg-[#8f1811] text-white px-8 py-3 sm:px-10 sm:py-5
-                       rounded-2xl text-base sm:text-xl font-semibold transition-colors duration-200
-                       shadow-lg hover:shadow-xl flex items-center gap-2 sm:gap-3 touch-manipulation"
+              className="w-full bg-[#DA291C] active:bg-[#B01F16] text-white
+                       py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-bold transition-colors shadow-lg
+                       flex items-center justify-center gap-2 touch-manipulation"
             >
-              <CloseIcon className="w-4 h-4 sm:w-6 sm:h-6" />
-              <span>{closeLabel}</span>
+              <CloseIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+              {showConversation ? 'Terminar atención' : closeLabel}
             </button>
           </div>
+
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // Códigos de área de 3 dígitos (capitales de provincia y grandes ciudades)
 // Todo lo que no esté acá se trata como área de 4 dígitos.
@@ -51,7 +51,7 @@ function formatArgentinePhone(raw: string): string {
 import {
   Hand, MessageCircle, Smartphone, CreditCard, Headphones,
   FileText, HelpCircle, ShoppingCart, DollarSign, Package,
-  RefreshCw, AlertCircle, ChevronLeft, Keyboard,
+  RefreshCw, AlertCircle, ChevronLeft, Keyboard, History, X,
 } from 'lucide-react';
 import { useBackHandler } from '../hooks/useBackHandler';
 import HelpModal from './HelpModal';
@@ -69,6 +69,13 @@ import {
 } from '../data/catalogos';
 
 type ConversationMode = 'hands' | 'dillo' | 'text';
+
+type ConversationEntry = {
+  id: string;
+  timestamp: Date;
+  role: 'client' | 'agent';
+  content: string;
+};
 
 const MODE_ICONS: Record<ConversationMode, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
   hands: Hand,
@@ -95,8 +102,6 @@ type PendingQuickTouch = {
 
 interface ServiceSelectionScreenProps {
   onSelectService: (service: string) => void;
-  avatarOn: boolean;
-  onToggleAvatar: () => void;
 }
 
 // Hover solo en dispositivos con puntero real → no queda "pegado" en touch.
@@ -110,8 +115,6 @@ const CARD_CLASS =
 
 export default function ServiceSelectionScreen({
   onSelectService: _onSelectService,
-  avatarOn,
-  onToggleAvatar,
 }: ServiceSelectionScreenProps) {
   const [showHelp, setShowHelp] = useState(false);
   const [iframeModal, setIframeModal] = useState<{ initialMode: ConversationMode } | null>(null);
@@ -132,6 +135,25 @@ export default function ServiceSelectionScreen({
   const [amountValue, setAmountValue] = useState('');
   const [phoneInput, setPhoneInput] = useState<{ pending: PendingQuickTouch } | null>(null);
   const [phoneValue, setPhoneValue] = useState('');
+  // Modal de respuesta del asesor abierto SOBRE QuickTouchScreen (z-[70] > z-[60])
+  const [replyModal, setReplyModal] = useState<ConversationMode | null>(null);
+
+  // Historial de conversación de la sesión actual
+  const [history, setHistory] = useState<ConversationEntry[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+
+  const addEntry = (role: ConversationEntry['role'], content: string) => {
+    setHistory((prev) => [...prev, { id: `${Date.now()}-${Math.random()}`, timestamp: new Date(), role, content }]);
+  };
+
+  // Muestra HelpModal automáticamente la primera vez que el usuario llega a esta pantalla
+  useEffect(() => {
+    if (!localStorage.getItem('claro-lsa-help-shown')) {
+      localStorage.setItem('claro-lsa-help-shown', '1');
+      setShowHelp(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useBackHandler(showHelp, () => setShowHelp(false));
   // El cierre del IframeModal lo maneja el propio componente con animación de salida.
@@ -153,6 +175,12 @@ export default function ServiceSelectionScreen({
     { id: 'other-procedure',   title: 'Otro trámite',            icon: FileText,     goToModeSelector: true },
   ];
 
+  const activateQuickTouch = (data: { title: string; speech: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; parentTitle?: string; phoneNumber?: string }) => {
+    setActiveQuickTouch(data);
+    const label = data.parentTitle ? `${data.parentTitle}: ${data.title}` : data.title;
+    addEntry('client', label);
+  };
+
   // Si el flujo necesita número de línea, guarda el QuickTouch como pendiente y
   // abre la pantalla de teléfono. Si no, abre QuickTouchScreen directo.
   const openQuickTouchOrPhone = (data: PendingQuickTouch, needsPhone: boolean) => {
@@ -160,7 +188,7 @@ export default function ServiceSelectionScreen({
       setPhoneValue('');
       setPhoneInput({ pending: data });
     } else {
-      setActiveQuickTouch(data);
+      activateQuickTouch(data);
     }
   };
 
@@ -212,7 +240,7 @@ export default function ServiceSelectionScreen({
     if (!phoneValue || !phoneInput) return;
     const { pending } = phoneInput;
     setPhoneInput(null);
-    setActiveQuickTouch({
+    activateQuickTouch({
       ...pending,
       speech: `${pending.speech}. Mi número de línea es ${phoneValue}`,
       phoneNumber: phoneValue,
@@ -221,6 +249,7 @@ export default function ServiceSelectionScreen({
 
   const openIframe = (mode: ConversationMode) => {
     setShowModeSelector(false);
+    if (mode === 'dillo') addEntry('agent', 'Respondió con Dillo');
     setIframeModal({ initialMode: mode });
   };
 
@@ -327,34 +356,23 @@ export default function ServiceSelectionScreen({
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between gap-3">
             <img
-              src="https://www.claro.com.ar/static/claro-logo-red-atlas-2.svg"
+              src="/claro/icons/claro-logo-red-atlas-2.svg"
               alt="Claro"
               className="h-6 sm:h-8"
             />
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              {/* Switch on/off del avatar de señas */}
-              <button
-                onClick={onToggleAvatar}
-                role="switch"
-                aria-checked={avatarOn}
-                aria-label={avatarOn ? 'Apagar traductor de señas' : 'Prender traductor de señas'}
-                className="flex items-center gap-2 touch-manipulation"
-              >
-                <Hand className="w-4 h-4 sm:hidden text-gray-600" strokeWidth={2} />
-                <span className="hidden sm:inline text-xs sm:text-sm font-medium text-gray-600">Dillo Intérprete</span>
-                <span
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
-                    avatarOn ? 'bg-[#DA291C]' : 'bg-gray-300'
-                  }`}
+              {history.length > 0 && (
+                <button
+                  onClick={() => setShowHistory(true)}
+                  className="relative px-3 py-2 sm:px-4 sm:py-2.5 bg-gray-100 active:bg-gray-200 text-gray-700 rounded-full text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 touch-manipulation flex-shrink-0"
                 >
-                  <span
-                    className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-200 ${
-                      avatarOn ? 'translate-x-5' : 'translate-x-0.5'
-                    }`}
-                  />
-                </span>
-              </button>
-
+                  <History className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="hidden sm:inline">Historial</span>
+                  <span className="w-4 h-4 bg-[#DA291C] text-white rounded-full text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+                    {history.length}
+                  </span>
+                </button>
+              )}
               <button
                 onClick={() => setShowHelp(true)}
                 className="px-3 py-2 sm:px-5 sm:py-2.5 bg-[#DA291C] active:bg-[#B01F16] text-white rounded-full text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 touch-manipulation flex-shrink-0"
@@ -392,13 +410,26 @@ export default function ServiceSelectionScreen({
                       <div className="w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center [@media(hover:hover)]:group-hover:scale-110 transition-transform shadow-sm flex-shrink-0">
                         <Icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#DA291C]" strokeWidth={2} />
                       </div>
-                      <p className="text-[11px] sm:text-xs md:text-sm font-semibold text-gray-900 [@media(hover:hover)]:group-hover:text-white transition-colors leading-tight">
+                      <p className="text-xs sm:text-xs md:text-sm font-semibold text-gray-900 [@media(hover:hover)]:group-hover:text-white transition-colors leading-tight">
                         {service.title}
                       </p>
                     </div>
                   </button>
                 );
               })}
+            </div>
+
+            {/* Botón para que el asesor responda directamente desde la pantalla principal */}
+            <div className="mt-4 sm:mt-6 pt-4 sm:pt-5 border-t border-gray-100">
+              <button
+                onClick={() => openIframe('dillo')}
+                className="w-full bg-gray-800 active:bg-gray-900 text-white py-3 sm:py-4 rounded-2xl
+                           text-sm sm:text-base font-bold transition-colors touch-manipulation
+                           flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                Asesor: respondé con Dillo →
+              </button>
             </div>
           </div>
 
@@ -427,12 +458,29 @@ export default function ServiceSelectionScreen({
           icon={activeQuickTouch.icon}
           parentTitle={activeQuickTouch.parentTitle}
           phoneNumber={activeQuickTouch.phoneNumber}
-          onClose={() => setActiveQuickTouch(null)}
+          onClose={() => { setActiveQuickTouch(null); setReplyModal(null); }}
+          showConversation
+          onOpenReplyModal={() => { addEntry('agent', 'Respondió con Dillo'); setReplyModal('dillo'); }}
+        />
+      )}
+
+      {/* Modal de respuesta del asesor — z-[70] para quedar sobre QuickTouchScreen (z-[60]).
+          "Volver al inicio" cierra ambos: el modal Y el QTS que quedó debajo. */}
+      {replyModal && (
+        <IframeModal
+          initialMode={replyModal}
+          onClose={() => { setReplyModal(null); setActiveQuickTouch(null); }}
+          zIndex="z-[70]"
+          onClientMessage={(msg) => addEntry('client', msg)}
         />
       )}
 
       {iframeModal && (
-        <IframeModal initialMode={iframeModal.initialMode} onClose={() => setIframeModal(null)} />
+        <IframeModal
+          initialMode={iframeModal.initialMode}
+          onClose={() => setIframeModal(null)}
+          onClientMessage={(msg) => addEntry('client', msg)}
+        />
       )}
 
       {/* Pantalla de subopciones */}
@@ -558,6 +606,57 @@ export default function ServiceSelectionScreen({
                 {phoneValue.replace(/\D/g, '').length >= 8 ? 'Continuar' : 'Ingresá tu número'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Historial de conversación */}
+      {showHistory && (
+        <div className="fixed inset-0 z-[80] bg-white flex flex-col animate-fade-in">
+          <div className="flex-shrink-0 bg-white border-b border-gray-200 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Historial de atención</h2>
+            <button
+              onClick={() => setShowHistory(false)}
+              aria-label="Cerrar historial"
+              className="p-2 hover:bg-gray-100 active:bg-gray-200 rounded-full transition-colors touch-manipulation"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3" style={{ WebkitOverflowScrolling: 'touch' }}>
+            {history.length === 0 ? (
+              <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+                No hay mensajes aún
+              </div>
+            ) : (
+              history.map((entry) => (
+                <div key={entry.id} className={`flex ${entry.role === 'client' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                    entry.role === 'client'
+                      ? 'bg-[#DA291C] text-white rounded-br-sm'
+                      : 'bg-gray-100 text-gray-800 rounded-bl-sm'
+                  }`}>
+                    <p className={`text-[10px] font-semibold mb-0.5 ${entry.role === 'client' ? 'text-white/70' : 'text-gray-500'}`}>
+                      {entry.role === 'client' ? 'Vos' : 'Asesor'}
+                    </p>
+                    <p className="text-sm sm:text-base font-semibold leading-snug">{entry.content}</p>
+                    <p className={`text-[10px] mt-1 ${entry.role === 'client' ? 'text-white/60 text-right' : 'text-gray-400'}`}>
+                      {entry.timestamp.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="flex-shrink-0 border-t border-gray-100 px-4 py-3">
+            <button
+              onClick={() => { setHistory([]); setShowHistory(false); }}
+              className="w-full py-3 rounded-xl text-sm font-semibold text-gray-500 border border-gray-200 active:bg-gray-50 transition-colors touch-manipulation"
+            >
+              Nueva atención (limpiar historial)
+            </button>
           </div>
         </div>
       )}

@@ -3,16 +3,24 @@ import { Keyboard } from 'lucide-react';
 import { useBackHandler } from '../hooks/useBackHandler';
 import QuickTouchScreen from './QuickTouchScreen';
 
+interface TextResponseModeProps {
+  onSwitchToDillo?: () => void;
+  isActive?: boolean;
+  // Notifica al padre cuando el usuario confirma un mensaje (para historial)
+  onMessage?: (msg: string) => void;
+}
+
 // "Responder con texto": el usuario sordo escribe su mensaje y lo confirma; recién
 // ahí se muestra en letras grandes y se reproduce por voz, igual que un Toque
-// Rápido. Separar tipeo y resultado en dos pantallas (en vez de mostrar/hablar en
-// vivo mientras escribe) evita que el teclado tape el mensaje cuando hay que
-// mostrarle la pantalla a la persona que atiende.
-export default function TextResponseMode() {
+// Rápido. Separar tipeo y resultado en dos pantallas evita que el teclado tape el
+// mensaje cuando hay que mostrarle la pantalla a la persona que atiende.
+export default function TextResponseMode({ onSwitchToDillo, isActive = true, onMessage }: TextResponseModeProps) {
   const [text, setText] = useState('');
   const [message, setMessage] = useState<string | null>(null);
 
-  useBackHandler(message !== null, () => { setMessage(null); setText(''); });
+  // Solo registra el back handler cuando este tab está visible.
+  // Si está oculto (CSS display:none pero montado), no debe interceptar el back del IframeModal.
+  useBackHandler(isActive && message !== null, () => { setMessage(null); setText(''); });
 
   if (message) {
     return (
@@ -24,6 +32,7 @@ export default function TextResponseMode() {
         closeLabel="Escribir otro mensaje"
         closeIcon={Keyboard}
         fullScreen={false}
+        onOpenReplyModal={onSwitchToDillo}
       />
     );
   }
@@ -52,7 +61,12 @@ export default function TextResponseMode() {
         </div>
 
         <button
-          onClick={() => canSubmit && setMessage(text.trim())}
+          onClick={() => {
+            if (!canSubmit) return;
+            const trimmed = text.trim();
+            onMessage?.(trimmed);
+            setMessage(trimmed);
+          }}
           disabled={!canSubmit}
           className={`w-full py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-bold transition-all duration-200 touch-manipulation ${
             canSubmit

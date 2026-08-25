@@ -101,7 +101,6 @@ function useThemeColor(color: string) {
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
-  const [avatarOn, setAvatarOn] = useState(false);
 
   useThemeColor(currentScreen === 'welcome' ? '#DA291C' : '#ffffff');
 
@@ -114,11 +113,7 @@ function App() {
   return (
     <div className="min-h-screen">
       {currentScreen === 'welcome' && (
-        <WelcomeScreen
-          onStart={() => setCurrentScreen('volume-reminder')}
-          onHelp={() => {}}
-          onAbout={() => {}}
-        />
+        <WelcomeScreen onStart={() => setCurrentScreen('volume-reminder')} />
       )}
 
       {currentScreen === 'volume-reminder' && (
@@ -126,16 +121,8 @@ function App() {
       )}
 
       {currentScreen === 'services' && (
-        <ServiceSelectionScreen
-          onSelectService={() => {}}
-          avatarOn={avatarOn}
-          onToggleAvatar={() => setAvatarOn((v) => !v)}
-        />
+        <ServiceSelectionScreen onSelectService={() => {}} />
       )}
-
-      {/* Plugin Dillo (avatar LSA): vive en todo el proyecto salvo la pantalla de
-          bienvenida. Se monta a nivel App para no perderse al cambiar de pantalla. */}
-      {currentScreen !== 'welcome' && avatarOn && <dillo-avatar-widget lang="lsa"></dillo-avatar-widget>}
 
       <DilloBubbleControl />
     </div>
