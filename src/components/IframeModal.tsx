@@ -29,6 +29,10 @@ export default function IframeModal({ initialMode, onClose, zIndex = 'z-50', onC
   const [isClosing, setIsClosing] = useState(false);
   const [handsLoaded, setHandsLoaded] = useState(false);
   const [dilloLoaded, setDilloLoaded] = useState(false);
+  // Lazy mount: cada iframe se monta la primera vez que se activa su tab.
+  // Una vez montado, permanece en el DOM (CSS display:none) para no recargar.
+  const [handsMounted, setHandsMounted] = useState(initialMode === 'hands');
+  const [dilloMounted, setDilloMounted] = useState(initialMode === 'dillo');
 
   // URL generada una sola vez al montar — no cambia al alternar tabs.
   const handsUrl = useRef(getHandsUrl()).current;
@@ -36,6 +40,12 @@ export default function IframeModal({ initialMode, onClose, zIndex = 'z-50', onC
   const requestClose = useCallback(() => setIsClosing(true), []);
 
   useBackHandler(true, requestClose);
+
+  // Monta el iframe la primera vez que se activa su tab
+  useEffect(() => {
+    if (activeMode === 'hands') setHandsMounted(true);
+    if (activeMode === 'dillo') setDilloMounted(true);
+  }, [activeMode]);
 
   // Escucha mensajes postMessage que los iframes de Dillo puedan enviar.
   // Logueamos todo para poder verificar en consola qué formato usan.
@@ -126,21 +136,23 @@ export default function IframeModal({ initialMode, onClose, zIndex = 'z-50', onC
           />
         </div>
 
-        {/* Iframe "Mis manos" — se monta una sola vez, se oculta con CSS */}
+        {/* Iframe "Mis manos" — se monta al primer acceso, se oculta con CSS después */}
         <div className={`absolute inset-0 ${activeMode === 'hands' ? 'flex' : 'hidden'} flex-col`}>
-          {!handsLoaded && (
+          {handsMounted && !handsLoaded && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white z-10">
               <div className="w-10 h-10 border-4 border-[#DA291C] border-t-transparent rounded-full animate-spin" />
               <p className="text-sm text-gray-500 font-medium">Cargando intérprete de señas…</p>
             </div>
           )}
-          <iframe
-            src={handsUrl}
-            className="w-full flex-1"
-            allow="camera; microphone; fullscreen"
-            title="Intérprete de Lengua de Señas"
-            onLoad={() => setHandsLoaded(true)}
-          />
+          {handsMounted && (
+            <iframe
+              src={handsUrl}
+              className="w-full flex-1"
+              allow="camera; microphone; fullscreen"
+              title="Intérprete de Lengua de Señas"
+              onLoad={() => setHandsLoaded(true)}
+            />
+          )}
           {/* Botón para que el asesor tome el turno y responda con Dillo */}
           <div className="flex-shrink-0 bg-white border-t border-gray-200 px-4 py-3 sm:px-6">
             <button
@@ -155,21 +167,23 @@ export default function IframeModal({ initialMode, onClose, zIndex = 'z-50', onC
           </div>
         </div>
 
-        {/* Iframe "Responder con Dillo" — se monta una sola vez, se oculta con CSS */}
+        {/* Iframe "Responder con Dillo" — se monta al primer acceso, se oculta con CSS después */}
         <div className={`absolute inset-0 ${activeMode === 'dillo' ? 'flex' : 'hidden'} flex-col`}>
-          {!dilloLoaded && (
+          {dilloMounted && !dilloLoaded && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white z-10">
               <div className="w-10 h-10 border-4 border-[#DA291C] border-t-transparent rounded-full animate-spin" />
               <p className="text-sm text-gray-500 font-medium">Cargando avatar de señas…</p>
             </div>
           )}
-          <iframe
-            src={DILLO_URL}
-            className="w-full flex-1"
-            allow="camera; microphone; fullscreen"
-            title="Avatar Dillo"
-            onLoad={() => setDilloLoaded(true)}
-          />
+          {dilloMounted && (
+            <iframe
+              src={DILLO_URL}
+              className="w-full flex-1"
+              allow="camera; microphone; fullscreen"
+              title="Avatar Dillo"
+              onLoad={() => setDilloLoaded(true)}
+            />
+          )}
           {/* Botón para devolver el turno al cliente sordo */}
           <div className="flex-shrink-0 bg-white border-t border-gray-200 px-4 py-3 sm:px-6">
             <button

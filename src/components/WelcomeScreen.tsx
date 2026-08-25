@@ -16,26 +16,42 @@ function useDeviceStatus() {
   const [mic, setMic] = useState<PermStatus>('checking');
 
   useEffect(() => {
+    // Usamos permissions.query() si está disponible: no activa hardware (sin spike de CPU/cámara).
+    // Fallback a getUserMedia solo en browsers que no soportan la Permissions API.
+    if (navigator.permissions) {
+      Promise.all([
+        navigator.permissions.query({ name: 'camera' as PermissionName }),
+        navigator.permissions.query({ name: 'microphone' as PermissionName }),
+      ])
+        .then(([cam, mic]) => {
+          const toStatus = (s: PermissionState): PermStatus =>
+            s === 'granted' ? 'granted' : s === 'denied' ? 'denied' : 'prompt';
+          setCamera(toStatus(cam.state));
+          setMic(toStatus(mic.state));
+        })
+        .catch(() => {
+          // permissions.query() falló (ej: browser viejo) — marcamos como disponibles
+          setCamera('prompt');
+          setMic('prompt');
+        });
+      return;
+    }
+
+    // Fallback: getUserMedia (activa hardware brevemente, pero solo en browsers sin Permissions API)
     if (!navigator.mediaDevices?.getUserMedia) {
       setCamera('unavailable');
       setMic('unavailable');
       return;
     }
-
-    // Pedimos los dos permisos al mismo tiempo → browser muestra un solo popup combinado.
-    // Si ya estaban otorgados, getUserMedia resuelve inmediatamente sin popup.
-    // Si ya estaban denegados, falla inmediatamente sin popup.
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
-        // Detenemos el stream de inmediato; solo necesitábamos el permiso.
         stream.getTracks().forEach((t) => t.stop());
         setCamera('granted');
         setMic('granted');
       })
       .catch((err: DOMException) => {
         if (err.name === 'NotAllowedError') {
-          // Alguno fue denegado — verificamos cuál individualmente.
           navigator.mediaDevices.getUserMedia({ video: true })
             .then((s) => { s.getTracks().forEach((t) => t.stop()); setCamera('granted'); })
             .catch(() => setCamera('denied'));
@@ -43,7 +59,6 @@ function useDeviceStatus() {
             .then((s) => { s.getTracks().forEach((t) => t.stop()); setMic('granted'); })
             .catch(() => setMic('denied'));
         } else {
-          // NotFoundError u otro error de hardware
           setCamera('unavailable');
           setMic('unavailable');
         }

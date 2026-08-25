@@ -51,7 +51,7 @@ function formatArgentinePhone(raw: string): string {
 import {
   Hand, MessageCircle, Smartphone, CreditCard, Headphones,
   FileText, HelpCircle, ShoppingCart, DollarSign, Package,
-  RefreshCw, AlertCircle, ChevronLeft, Keyboard, History, X,
+  RefreshCw, AlertCircle, ChevronLeft, ChevronRight, Keyboard, History, X,
 } from 'lucide-react';
 import { useBackHandler } from '../hooks/useBackHandler';
 import HelpModal from './HelpModal';
@@ -350,7 +350,7 @@ export default function ServiceSelectionScreen({
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col animate-slide-in overflow-hidden">
+    <div className="h-screen bg-gray-50 flex flex-col animate-slide-in overflow-hidden" style={{ height: '100dvh' }}>
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <header className="bg-white border-b border-gray-100 py-3 sm:py-4 md:py-5 flex-shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -554,10 +554,31 @@ export default function ServiceSelectionScreen({
           <OverlayHeader title="¿Cómo querés comunicarte?" onBack={() => setShowModeSelector(false)} />
 
           <div className="flex-1 flex items-center justify-center px-4 py-6 sm:px-6 sm:py-8">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-3xl w-full">
-              <ModeButton mode="hands" label="Hablo con mis manos" showIllustration={false} />
-              <ModeButton mode="dillo" label="Responder con Dillo" showIllustration={false} />
-              <ModeButton mode="text" label="Responder con texto" showIllustration={false} />
+            <div className="flex flex-col gap-3 sm:gap-4 max-w-lg w-full">
+              {([
+                { mode: 'hands' as ConversationMode, label: 'Hablo con mis manos', Icon: Hand, solid: true },
+                { mode: 'dillo' as ConversationMode, label: 'Responder con Dillo', Icon: MessageCircle, solid: false },
+                { mode: 'text'  as ConversationMode, label: 'Responder con texto',  Icon: Keyboard,       solid: false },
+              ] as const).map(({ mode, label, Icon, solid }) => (
+                <button
+                  key={mode}
+                  onClick={() => openIframe(mode)}
+                  className={`w-full flex items-center gap-4 px-5 py-4 sm:py-5 rounded-2xl border-2 shadow-sm
+                              transition-all duration-150 touch-manipulation active:scale-[0.98]
+                              ${solid
+                                ? 'bg-[#DA291C] border-[#DA291C] active:bg-[#B01F16]'
+                                : 'bg-white border-[#DA291C]/30 [@media(hover:hover)]:hover:border-[#DA291C]'}`}
+                >
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center flex-shrink-0
+                                  ${solid ? 'bg-white/20' : 'bg-[#DA291C]/10'}`}>
+                    <Icon className={`w-6 h-6 sm:w-7 sm:h-7 ${solid ? 'text-white' : 'text-[#DA291C]'}`} strokeWidth={2.5} />
+                  </div>
+                  <span className={`text-base sm:text-lg font-bold flex-1 text-left ${solid ? 'text-white' : 'text-[#DA291C]'}`}>
+                    {label}
+                  </span>
+                  <ChevronRight className={`w-5 h-5 flex-shrink-0 ${solid ? 'text-white/70' : 'text-[#DA291C]/50'}`} />
+                </button>
+              ))}
             </div>
           </div>
         </div>

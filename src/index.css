@@ -40,28 +40,26 @@
     height: 100%;
   }
 
-  * {
-    -webkit-overflow-scrolling: touch;
-  }
-
   [class*="overflow-y-auto"], [style*="overflow-y: auto"] {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
-    scroll-behavior: smooth;
   }
 }
 
 @layer utilities {
   .animate-fade-in {
-    animation: fadeIn 0.8s ease-out;
+    will-change: opacity;
+    animation: fadeIn 0.2s ease-out forwards;
   }
 
   .animate-slide-in {
-    animation: slideIn 0.5s ease-out;
+    will-change: opacity, transform;
+    animation: slideIn 0.25s ease-out forwards;
   }
 
   .animate-slide-up {
-    animation: slideUp 0.4s ease-out;
+    will-change: opacity, transform;
+    animation: slideUp 0.25s ease-out forwards;
   }
 
   .animate-pulse-subtle {
