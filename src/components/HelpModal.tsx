@@ -10,7 +10,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
       <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
           <img
-            src="/claro/icons/claro-logo-red-atlas-2.svg"
+            src={`${import.meta.env.BASE_URL}icons/claro-logo-red-atlas-2.svg`}
             alt="Claro"
             className="h-8"
           />
@@ -131,7 +131,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
         <div className="sticky bottom-0 bg-white border-t border-gray-100 px-6 py-4 rounded-b-2xl">
           <div className="flex items-center justify-center">
             <img
-              src="/claro/icons/claro-logo-red-atlas-2.svg"
+              src={`${import.meta.env.BASE_URL}icons/claro-logo-red-atlas-2.svg`}
               alt="Claro"
               className="h-6 opacity-60"
             />

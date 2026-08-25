@@ -70,24 +70,6 @@ export default function IframeModal({ initialMode, onClose, zIndex = 'z-50', onC
     return () => window.removeEventListener('message', handler);
   }, [onClientMessage]);
 
-  // Quita el <dillo-interpreter> del DOM mientras el modal está abierto
-  // (evita conflictos con el iframe de LSA) y lo restaura al cerrar.
-  useEffect(() => {
-    const widget = document.querySelector('dillo-interpreter');
-    const attributes = widget
-      ? Array.from(widget.attributes).map((attr) => [attr.name, attr.value] as const)
-      : null;
-    widget?.remove();
-
-    return () => {
-      if (attributes && !document.querySelector('dillo-interpreter')) {
-        const restored = document.createElement('dillo-interpreter');
-        attributes.forEach(([name, value]) => restored.setAttribute(name, value));
-        document.body.appendChild(restored);
-      }
-    };
-  }, []);
-
   return (
     <div
       className={`fixed inset-0 bg-white ${zIndex} flex flex-col ${isClosing ? 'opacity-0 pointer-events-none' : 'animate-fade-in'} transition-opacity duration-150`}

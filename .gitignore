@@ -10,9 +10,14 @@ node_modules
 dist
 dist-dev
 dist-ssr
+dist-v1/
+dist-v2/
 *.local
 backup/
 build dev/
+
+# TypeScript incremental build cache
+*.tsbuildinfo
 
 .vscode/*
 !.vscode/extensions.json

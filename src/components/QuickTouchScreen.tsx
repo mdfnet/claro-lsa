@@ -1,6 +1,49 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Check, RotateCcw, Volume2, MessageSquare } from 'lucide-react';
 
+// Android Chrome carga las voces TTS de forma asíncrona. Llamar getVoices()
+// en el primer render devuelve array vacío en Samsung/Motorola → speak() falla
+// silenciosamente. Esperamos el evento voiceschanged con fallback de 1.5s.
+function getVoicesAsync(): Promise<SpeechSynthesisVoice[]> {
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length > 0) return Promise.resolve(voices);
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      window.speechSynthesis.removeEventListener('voiceschanged', finish);
+      resolve(window.speechSynthesis.getVoices());
+    };
+    window.speechSynthesis.addEventListener('voiceschanged', finish);
+    // Algunos engines Android nunca disparan voiceschanged — fallback para no colgar
+    setTimeout(finish, 1500);
+  });
+}
+
+// Elige la mejor voz española disponible priorizando acento latinoamericano.
+// Si no hay ninguna, devuelve null y el browser usa su voz por defecto
+// (mejor que silencio en algunos engines Android).
+function pickSpanishVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
+  if (voices.length === 0) return null;
+  const latam = voices.find((v) =>
+    (v.lang.startsWith('es-AR') || v.lang.startsWith('es-MX') ||
+     v.lang.startsWith('es-CO') || v.lang.startsWith('es-CL') ||
+     v.lang.startsWith('es-419') || v.lang.startsWith('es-UY') ||
+     v.lang.startsWith('es-VE') || v.lang.startsWith('es-PE')) &&
+    !v.name.toLowerCase().includes('spain') &&
+    !v.name.toLowerCase().includes('españa')
+  );
+  if (latam) return latam;
+  const nonSpain = voices.find((v) =>
+    v.lang.startsWith('es') &&
+    !v.lang.startsWith('es-ES') &&
+    !v.name.toLowerCase().includes('spain') &&
+    !v.name.toLowerCase().includes('españa')
+  );
+  return nonSpain ?? voices.find((v) => v.lang.startsWith('es')) ?? null;
+}
+
 interface QuickTouchScreenProps {
   title: string;
   speech: string;
@@ -44,32 +87,38 @@ export default function QuickTouchScreen({
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(speech);
-    const voices = window.speechSynthesis.getVoices();
+    void (async () => {
+      const voices = await getVoicesAsync();
+      const picked = pickSpanishVoice(voices);
 
-    const latinAmericanVoice = voices.find((v) =>
-      (v.lang.startsWith('es-419') || v.lang.startsWith('es-MX') ||
-       v.lang.startsWith('es-AR') || v.lang.startsWith('es-CO') ||
-       v.lang.startsWith('es-CL') || v.lang.startsWith('es-VE') ||
-       v.lang.startsWith('es-PE') || v.lang.startsWith('es-UY')) &&
-      !v.name.toLowerCase().includes('spain') &&
-      !v.name.toLowerCase().includes('españa')
-    );
-    const neutralVoice = latinAmericanVoice || voices.find((v) =>
-      v.lang.startsWith('es') && !v.lang.startsWith('es-ES') &&
-      !v.name.toLowerCase().includes('spain') && !v.name.toLowerCase().includes('españa')
-    );
-    const fallback = neutralVoice || voices.find((v) => v.lang.startsWith('es'));
-    if (fallback) utterance.voice = fallback;
+      const utterance = new SpeechSynthesisUtterance(speech);
+      if (picked) utterance.voice = picked;
+      // Usamos el lang de la voz encontrada: 'es-419' no lo reconocen todos los
+      // engines Android (Samsung, Motorola), lo que provoca silencio en campo.
+      utterance.lang = picked?.lang ?? 'es-AR';
+      utterance.rate = 0.85;
+      utterance.pitch = 1.0;
+      utterance.volume = 1;
 
-    utterance.lang = 'es-419';
-    utterance.rate = 0.85;
-    utterance.pitch = 1.0;
-    utterance.volume = 1;
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    window.speechSynthesis.speak(utterance);
+      // Bug de Chrome Android: speechSynthesis.speak() se pausa silenciosamente
+      // después de ~15s. Workaround: hacer resume() cada 5s mientras habla.
+      let resumeTimer: ReturnType<typeof setInterval> | null = null;
+
+      utterance.onstart = () => {
+        setIsSpeaking(true);
+        resumeTimer = setInterval(() => {
+          if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+        }, 5000);
+      };
+      const cleanup = () => {
+        setIsSpeaking(false);
+        if (resumeTimer) { clearInterval(resumeTimer); resumeTimer = null; }
+      };
+      utterance.onend = cleanup;
+      utterance.onerror = cleanup;
+
+      window.speechSynthesis.speak(utterance);
+    })();
   }, [speech]);
 
   useEffect(() => {

@@ -117,7 +117,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
       <div className="text-center space-y-8 sm:space-y-12 max-w-4xl w-full px-4">
         <div className="space-y-6 sm:space-y-8">
           <img
-            src="/claro/icons/claro-logo.svg"
+            src={`${import.meta.env.BASE_URL}icons/claro-logo.svg`}
             alt="Claro"
             className="h-24 sm:h-32 md:h-40 mx-auto"
           />

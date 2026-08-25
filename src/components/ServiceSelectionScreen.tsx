@@ -356,7 +356,7 @@ export default function ServiceSelectionScreen({
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between gap-3">
             <img
-              src="/claro/icons/claro-logo-red-atlas-2.svg"
+              src={`${import.meta.env.BASE_URL}icons/claro-logo-red-atlas-2.svg`}
               alt="Claro"
               className="h-6 sm:h-8"
             />
