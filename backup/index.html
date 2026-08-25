@@ -2,15 +2,15 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="%BASE_URL%icons/favicon.ico" />
-    <link rel="icon" type="image/png" sizes="32x32" href="%BASE_URL%icons/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="%BASE_URL%icons/favicon-16x16.png" />
-    <link rel="apple-touch-icon" href="%BASE_URL%icons/apple-touch-icon.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="%BASE_URL%icons/apple-touch-icon.png" />
-    <link rel="apple-touch-icon" sizes="167x167" href="%BASE_URL%icons/icon-167x167.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="%BASE_URL%icons/icon-152x152.png" />
-    <link rel="apple-touch-icon" sizes="120x120" href="%BASE_URL%icons/icon-120x120.png" />
-    <link rel="manifest" href="%BASE_URL%manifest.json" />
+    <link rel="icon" type="image/x-icon" href="/claro/icons/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/claro/icons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/claro/icons/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/claro/icons/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/claro/icons/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/claro/icons/icon-167x167.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/claro/icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/claro/icons/icon-120x120.png" />
+    <link rel="manifest" href="/claro/manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
     <meta name="theme-color" content="#DA291C" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -18,6 +18,8 @@
     <meta name="apple-mobile-web-app-title" content="Claro Dillo" />
     <meta name="description" content="Estación de Atención Inclusiva - Claro Argentina. Atención accesible para personas sordas." />
     <title>Claro - Estación de Atención Inclusiva</title>
+    <script type="module" crossorigin src="/claro/assets/index-BGGZIJZy.js"></script>
+    <link rel="stylesheet" crossorigin href="/claro/assets/index-B_zcHuRi.css">
   </head>
   <body>
     <div id="root"></div>
@@ -34,8 +36,8 @@
 
     <!-- Plugin Dillo (nuevo): avatar widget LSA -->
     <!-- El <script> solo registra el custom element; el widget <dillo-avatar-widget>
-         se monta desde App.tsx para que viva en todo el proyecto, excepto en la
-         pantalla de bienvenida. -->
+         se monta desde ServiceSelectionScreen para que viva solo en la pantalla de
+         Toques Rápidos y no en el inicio. -->
     <script type="module" src="https://cdn.jsdelivr.net/gh/dillo-ai/dillo.plugin.avatar.dist@v1.0.4/dillo-avatar-plugin.js"></script>
 
     <script>
@@ -43,6 +45,5 @@
         window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
       }
     </script>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

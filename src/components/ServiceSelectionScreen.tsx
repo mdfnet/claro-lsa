@@ -51,7 +51,7 @@ function formatArgentinePhone(raw: string): string {
 import {
   Hand, MessageCircle, Smartphone, CreditCard, Headphones,
   FileText, HelpCircle, ShoppingCart, DollarSign, Package,
-  RefreshCw, AlertCircle, ChevronLeft,
+  RefreshCw, AlertCircle, ChevronLeft, Keyboard,
 } from 'lucide-react';
 import { useBackHandler } from '../hooks/useBackHandler';
 import HelpModal from './HelpModal';
@@ -67,6 +67,14 @@ import {
   SUBOPCIONES_PROBLEMA_FACTURA,
   SUBOPCIONES_SOPORTE,
 } from '../data/catalogos';
+
+type ConversationMode = 'hands' | 'dillo' | 'text';
+
+const MODE_ICONS: Record<ConversationMode, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
+  hands: Hand,
+  dillo: MessageCircle,
+  text: Keyboard,
+};
 
 interface QuickTouchService {
   id: string;
@@ -87,6 +95,8 @@ type PendingQuickTouch = {
 
 interface ServiceSelectionScreenProps {
   onSelectService: (service: string) => void;
+  avatarOn: boolean;
+  onToggleAvatar: () => void;
 }
 
 // Hover solo en dispositivos con puntero real → no queda "pegado" en touch.
@@ -98,10 +108,13 @@ const CARD_CLASS =
   '[@media(hover:hover)]:hover:shadow-lg [@media(hover:hover)]:hover:scale-[1.02] ' +
   'active:scale-[0.97] active:bg-gray-100 active:border-gray-300 touch-manipulation';
 
-export default function ServiceSelectionScreen({ onSelectService: _onSelectService }: ServiceSelectionScreenProps) {
+export default function ServiceSelectionScreen({
+  onSelectService: _onSelectService,
+  avatarOn,
+  onToggleAvatar,
+}: ServiceSelectionScreenProps) {
   const [showHelp, setShowHelp] = useState(false);
-  const [avatarOn, setAvatarOn] = useState(false);
-  const [iframeModal, setIframeModal] = useState<{ initialMode: 'hands' | 'dillo' } | null>(null);
+  const [iframeModal, setIframeModal] = useState<{ initialMode: ConversationMode } | null>(null);
   const [activeQuickTouch, setActiveQuickTouch] = useState<{
     title: string;
     speech: string;
@@ -206,7 +219,7 @@ export default function ServiceSelectionScreen({ onSelectService: _onSelectServi
     });
   };
 
-  const openIframe = (mode: 'hands' | 'dillo') => {
+  const openIframe = (mode: ConversationMode) => {
     setShowModeSelector(false);
     setIframeModal({ initialMode: mode });
   };
@@ -227,29 +240,39 @@ export default function ServiceSelectionScreen({ onSelectService: _onSelectServi
 
   // ── Mode button — usado en pantalla principal y en selector ──────────────────
   const ModeButton = ({ mode, label, showIllustration = true }: {
-    mode: 'hands' | 'dillo';
+    mode: ConversationMode;
     label: string;
     showIllustration?: boolean;
   }) => {
     const isHands = mode === 'hands';
+    const Icon = MODE_ICONS[mode];
     return (
       <button
         onClick={() => openIframe(mode)}
-        className="group bg-white rounded-2xl sm:rounded-3xl shadow-md sm:shadow-lg active:shadow-sm
-                   transition-all duration-200 overflow-hidden border-2 sm:border-4 border-transparent
+        className={`group rounded-2xl sm:rounded-3xl shadow-md sm:shadow-lg active:shadow-sm
+                   transition-all duration-200 overflow-hidden border-2 sm:border-4
                    [@media(hover:hover)]:hover:border-[#DA291C]/20 [@media(hover:hover)]:hover:shadow-xl
-                   active:scale-[0.98] touch-manipulation w-full"
+                   active:scale-[0.98] touch-manipulation w-full h-full ${
+                     showIllustration
+                       ? isHands
+                         ? 'bg-[#DA291C] border-[#DA291C] sm:bg-white sm:border-transparent'
+                         : 'bg-white border-[#DA291C]/50 sm:border-transparent'
+                       : 'bg-white border-transparent'
+                   }`}
       >
-        <div className="p-4 sm:p-7 md:p-10 flex flex-col items-center gap-3 sm:gap-5">
-          {/* Ícono compacto mobile / ilustración decorativa sm+ */}
-          <div className={`${showIllustration ? '' : 'hidden'}`}>
-            {/* Mobile: círculo simple */}
-            <div className={`sm:hidden w-14 h-14 rounded-full flex items-center justify-center shadow-md ${
-              isHands ? 'bg-[#DA291C]' : 'bg-white border-4 border-[#DA291C]'
-            }`}>
-              {isHands
-                ? <Hand className="w-7 h-7 text-white" strokeWidth={2.5} />
-                : <MessageCircle className="w-7 h-7 text-[#DA291C]" strokeWidth={2.5} />}
+        <div className="p-3 sm:p-7 md:p-10 flex flex-col items-center gap-2 sm:gap-5 h-full justify-center">
+          {/* Ícono + etiqueta compactos en mobile / ilustración decorativa sm+ */}
+          <div className={`${showIllustration ? '' : 'hidden'} w-full flex flex-col items-center gap-2`}>
+            {/* Mobile: ícono chico + texto simple, sin la píldora de abajo */}
+            <div className="sm:hidden flex flex-col items-center gap-1.5">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                isHands ? 'bg-white/20' : 'bg-[#DA291C]/10'
+              }`}>
+                <Icon className={`w-5 h-5 ${isHands ? 'text-white' : 'text-[#DA291C]'}`} strokeWidth={2.5} />
+              </div>
+              <p className={`text-xs font-bold text-center leading-tight ${isHands ? 'text-white' : 'text-[#DA291C]'}`}>
+                {label}
+              </p>
             </div>
             {/* Tablet+: ilustración decorativa */}
             <div className="hidden sm:block relative w-32 h-32 md:w-44 md:h-44">
@@ -258,7 +281,7 @@ export default function ServiceSelectionScreen({ onSelectService: _onSelectServi
                   {isHands ? (
                     <div className="relative">
                       <div className="w-16 h-16 md:w-20 md:h-20 bg-[#DA291C] rounded-full flex items-center justify-center">
-                        <Hand className="w-8 h-8 md:w-10 md:h-10 text-white" strokeWidth={2.5} />
+                        <Icon className="w-8 h-8 md:w-10 md:h-10 text-white" strokeWidth={2.5} />
                       </div>
                       <div className="absolute -top-5 -right-1 w-10 h-10 bg-[#DA291C]/70 rounded-full opacity-30" />
                       <div className="absolute -bottom-4 -left-3 w-8 h-8 bg-[#DA291C]/50 rounded-full opacity-40" />
@@ -266,7 +289,7 @@ export default function ServiceSelectionScreen({ onSelectService: _onSelectServi
                   ) : (
                     <div className="relative">
                       <div className="w-16 h-16 md:w-20 md:h-20 bg-white border-4 border-[#DA291C] rounded-full flex items-center justify-center">
-                        <MessageCircle className="w-8 h-8 md:w-9 md:h-9 text-[#DA291C]" strokeWidth={2.5} />
+                        <Icon className="w-8 h-8 md:w-9 md:h-9 text-[#DA291C]" strokeWidth={2.5} />
                       </div>
                       <div className="absolute -top-3 -right-3 w-7 h-7 bg-white border-4 border-[#DA291C]/70 rounded-full flex items-center justify-center opacity-60">
                         <div className="w-1.5 h-1.5 bg-[#DA291C] rounded-full" />
@@ -278,15 +301,17 @@ export default function ServiceSelectionScreen({ onSelectService: _onSelectServi
             </div>
           </div>
 
-          {/* Label */}
+          {/* Label — píldora completa. En la grilla principal (showIllustration) sólo se ve
+              desde sm+, porque en mobile ya se usa el texto compacto de arriba. En el selector
+              de modo (!showIllustration) es la única etiqueta y se ve en todos los tamaños. */}
           {isHands ? (
-            <div className="bg-[#DA291C] [@media(hover:hover)]:group-hover:bg-[#B01F16] text-white rounded-xl sm:rounded-2xl px-4 sm:px-7 py-2.5 sm:py-3.5 transition-colors inline-flex items-center gap-2 sm:gap-3 shadow-md">
-              <Hand className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" strokeWidth={2.5} />
+            <div className={`${showIllustration ? 'hidden sm:inline-flex' : 'inline-flex'} bg-[#DA291C] [@media(hover:hover)]:group-hover:bg-[#B01F16] text-white rounded-xl sm:rounded-2xl px-4 sm:px-7 py-2.5 sm:py-3.5 transition-colors items-center gap-2 sm:gap-3 shadow-md`}>
+              <Icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" strokeWidth={2.5} />
               <span className="text-sm sm:text-lg md:text-xl font-bold leading-tight">{label}</span>
             </div>
           ) : (
-            <div className="bg-white border-2 sm:border-4 border-[#DA291C] [@media(hover:hover)]:group-hover:border-[#B01F16] text-[#DA291C] [@media(hover:hover)]:group-hover:text-[#B01F16] rounded-xl sm:rounded-2xl px-4 sm:px-7 py-2.5 sm:py-3.5 transition-colors inline-flex items-center gap-2 sm:gap-3 shadow-md">
-              <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" strokeWidth={2.5} />
+            <div className={`${showIllustration ? 'hidden sm:inline-flex' : 'inline-flex'} bg-white border-2 sm:border-4 border-[#DA291C] [@media(hover:hover)]:group-hover:border-[#B01F16] text-[#DA291C] [@media(hover:hover)]:group-hover:text-[#B01F16] rounded-xl sm:rounded-2xl px-4 sm:px-7 py-2.5 sm:py-3.5 transition-colors items-center gap-2 sm:gap-3 shadow-md`}>
+              <Icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" strokeWidth={2.5} />
               <span className="text-sm sm:text-lg md:text-xl font-bold leading-tight">{label}</span>
             </div>
           )}
@@ -309,12 +334,13 @@ export default function ServiceSelectionScreen({ onSelectService: _onSelectServi
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               {/* Switch on/off del avatar de señas */}
               <button
-                onClick={() => setAvatarOn((v) => !v)}
+                onClick={onToggleAvatar}
                 role="switch"
                 aria-checked={avatarOn}
                 aria-label={avatarOn ? 'Apagar traductor de señas' : 'Prender traductor de señas'}
                 className="flex items-center gap-2 touch-manipulation"
               >
+                <Hand className="w-4 h-4 sm:hidden text-gray-600" strokeWidth={2} />
                 <span className="hidden sm:inline text-xs sm:text-sm font-medium text-gray-600">Dillo Intérprete</span>
                 <span
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
@@ -345,10 +371,6 @@ export default function ServiceSelectionScreen({ onSelectService: _onSelectServi
       {/* ── Contenido scrolleable ────────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto px-3 py-4 sm:px-5 sm:py-6 md:px-6 md:py-8" style={{ WebkitOverflowScrolling: 'touch' }}>
         <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6 md:space-y-8">
-
-          {/* Plugin Dillo (avatar LSA): vive solo en la pantalla de Toques Rápidos.
-              Se monta/desmonta con el switch on/off del header. */}
-          {avatarOn && <dillo-avatar-widget lang="lsa"></dillo-avatar-widget>}
 
           {/* Grilla de Toques Rápidos */}
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8">
@@ -381,9 +403,14 @@ export default function ServiceSelectionScreen({ onSelectService: _onSelectServi
           </div>
 
           {/* Botones de modo de conversación */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-5 md:gap-8">
+          <div className="text-center px-2">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1">Más maneras de comunicarte</h3>
+            <p className="text-xs sm:text-sm text-gray-500">Elegí la forma que te resulte más cómoda para hablar con la persona que te atiende</p>
+          </div>
+          <div className="grid grid-cols-3 gap-2 sm:gap-5 md:gap-8">
             <ModeButton mode="hands" label="Hablo con mis manos" />
             <ModeButton mode="dillo" label="Responder con Dillo" />
+            <ModeButton mode="text" label="Responder con texto" />
           </div>
 
         </div>
@@ -479,9 +506,10 @@ export default function ServiceSelectionScreen({ onSelectService: _onSelectServi
           <OverlayHeader title="¿Cómo querés comunicarte?" onBack={() => setShowModeSelector(false)} />
 
           <div className="flex-1 flex items-center justify-center px-4 py-6 sm:px-6 sm:py-8">
-            <div className="grid grid-cols-2 gap-4 sm:gap-6 max-w-2xl w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-3xl w-full">
               <ModeButton mode="hands" label="Hablo con mis manos" showIllustration={false} />
               <ModeButton mode="dillo" label="Responder con Dillo" showIllustration={false} />
+              <ModeButton mode="text" label="Responder con texto" showIllustration={false} />
             </div>
           </div>
         </div>

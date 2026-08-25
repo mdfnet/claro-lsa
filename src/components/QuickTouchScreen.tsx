@@ -8,11 +8,20 @@ interface QuickTouchScreenProps {
   onClose: () => void;
   parentTitle?: string;
   phoneNumber?: string;
+  closeLabel?: string;
+  closeIcon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  // false cuando vive dentro de otra pantalla que ya tiene su propio chrome (por
+  // ejemplo la barra de modos de IframeModal) y no debe taparlo con un overlay
+  // a pantalla completa.
+  fullScreen?: boolean;
 }
 
 const BAR_COUNT = 5;
 
-export default function QuickTouchScreen({ title, speech, icon: _Icon, onClose, parentTitle, phoneNumber }: QuickTouchScreenProps) {
+export default function QuickTouchScreen({
+  title, speech, icon: _Icon, onClose, parentTitle, phoneNumber,
+  closeLabel = 'Listo', closeIcon: CloseIcon = Check, fullScreen = true,
+}: QuickTouchScreenProps) {
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   useEffect(() => {
@@ -88,7 +97,7 @@ export default function QuickTouchScreen({ title, speech, icon: _Icon, onClose, 
   }, [playSpeech]);
 
   return (
-    <div className="fixed inset-0 z-[60] bg-white flex flex-col animate-fade-in">
+    <div className={`${fullScreen ? 'fixed inset-0 z-[60]' : 'w-full h-full'} bg-white flex flex-col animate-fade-in`}>
       <div className="flex-1 overflow-y-auto flex flex-col items-center justify-center px-6 py-4 sm:px-10 sm:py-6 text-center gap-5 sm:gap-10" style={{ WebkitOverflowScrolling: 'touch' }}>
         <div className="flex flex-col items-center gap-2 text-gray-500">
           {parentTitle && (
@@ -165,8 +174,8 @@ export default function QuickTouchScreen({ title, speech, icon: _Icon, onClose, 
                        rounded-2xl text-base sm:text-xl font-semibold transition-colors duration-200
                        shadow-lg hover:shadow-xl flex items-center gap-2 sm:gap-3 touch-manipulation"
             >
-              <Check className="w-4 h-4 sm:w-6 sm:h-6" />
-              <span>Listo</span>
+              <CloseIcon className="w-4 h-4 sm:w-6 sm:h-6" />
+              <span>{closeLabel}</span>
             </button>
           </div>
         </div>

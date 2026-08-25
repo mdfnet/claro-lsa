@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useBackButtonNavigation, useBackHandler } from './hooks/useBackHandler';
 import WelcomeScreen from './components/WelcomeScreen';
 import VolumeReminderScreen from './components/VolumeReminderScreen';
@@ -101,6 +101,7 @@ function useThemeColor(color: string) {
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
+  const [avatarOn, setAvatarOn] = useState(false);
 
   useThemeColor(currentScreen === 'welcome' ? '#DA291C' : '#ffffff');
 
@@ -125,8 +126,16 @@ function App() {
       )}
 
       {currentScreen === 'services' && (
-        <ServiceSelectionScreen onSelectService={() => {}} />
+        <ServiceSelectionScreen
+          onSelectService={() => {}}
+          avatarOn={avatarOn}
+          onToggleAvatar={() => setAvatarOn((v) => !v)}
+        />
       )}
+
+      {/* Plugin Dillo (avatar LSA): vive en todo el proyecto salvo la pantalla de
+          bienvenida. Se monta a nivel App para no perderse al cambiar de pantalla. */}
+      {currentScreen !== 'welcome' && avatarOn && <dillo-avatar-widget lang="lsa"></dillo-avatar-widget>}
 
       <DilloBubbleControl />
     </div>
