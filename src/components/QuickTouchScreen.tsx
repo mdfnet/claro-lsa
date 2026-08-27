@@ -73,7 +73,7 @@ export default function QuickTouchScreen({
   showConversation = false,
   onOpenReplyModal,
 }: QuickTouchScreenProps) {
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [audioState, setAudioState] = useState<'pending' | 'speaking' | 'done'>('pending');
   const genRef = useRef(0);
 
   // Solo prevenimos pull-to-refresh en modo fullscreen
@@ -112,13 +112,13 @@ export default function QuickTouchScreen({
 
       utterance.onstart = () => {
         if (genRef.current !== myGen) return;
-        setIsSpeaking(true);
+        setAudioState('speaking');
         resumeTimer = setInterval(() => {
           if (window.speechSynthesis.paused) window.speechSynthesis.resume();
         }, 5000);
       };
       const cleanup = () => {
-        setIsSpeaking(false);
+        setAudioState('done');
         if (resumeTimer) { clearInterval(resumeTimer); resumeTimer = null; }
       };
       utterance.onend = cleanup;
@@ -129,11 +129,12 @@ export default function QuickTouchScreen({
   }, [speech]);
 
   useEffect(() => {
+    setAudioState('pending');
     playSpeech();
     return () => {
       genRef.current++;
       window.speechSynthesis.cancel();
-      setIsSpeaking(false);
+      setAudioState('pending');
     };
   }, [playSpeech]);
 
@@ -187,14 +188,14 @@ export default function QuickTouchScreen({
             )}
           </div>
 
-          {/* Indicador de audio */}
+          {/* Indicador de audio — BUG-05: tri-state para no mostrar "reproducido" antes de empezar */}
           <div className="flex flex-col items-center gap-2 sm:gap-3">
             <div
               className={`relative w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center transition-colors duration-300 ${
-                isSpeaking ? 'bg-[#DA291C]' : 'bg-gray-200'
+                audioState === 'speaking' ? 'bg-[#DA291C]' : 'bg-gray-200'
               }`}
             >
-              {isSpeaking && (
+              {audioState === 'speaking' && (
                 <>
                   <span className="absolute inset-0 rounded-full bg-[#DA291C]/40 animate-ping" />
                   <span className="absolute -inset-2 rounded-full border-2 border-[#DA291C]/30 animate-pulse" />
@@ -202,7 +203,7 @@ export default function QuickTouchScreen({
               )}
               <Volume2
                 className={`w-7 h-7 sm:w-9 sm:h-9 relative z-10 transition-colors duration-300 ${
-                  isSpeaking ? 'text-white' : 'text-gray-500'
+                  audioState === 'speaking' ? 'text-white' : 'text-gray-500'
                 }`}
               />
             </div>
@@ -212,15 +213,15 @@ export default function QuickTouchScreen({
                 <div
                   key={i}
                   className={`w-1.5 sm:w-2 h-5 sm:h-7 rounded-full origin-bottom transition-colors duration-300 ${
-                    isSpeaking ? 'bg-[#DA291C] animate-sound-wave' : 'bg-gray-300'
+                    audioState === 'speaking' ? 'bg-[#DA291C] animate-sound-wave' : 'bg-gray-300'
                   }`}
-                  style={isSpeaking ? { animationDelay: `${i * 0.12}s` } : { transform: 'scaleY(0.25)' }}
+                  style={audioState === 'speaking' ? { animationDelay: `${i * 0.12}s` } : { transform: 'scaleY(0.25)' }}
                 />
               ))}
             </div>
 
             <p className="text-sm sm:text-base text-gray-500 font-medium">
-              {isSpeaking ? 'Reproduciendo…' : 'Mensaje reproducido'}
+              {audioState === 'pending' ? 'Preparando audio…' : audioState === 'speaking' ? 'Reproduciendo…' : 'Mensaje reproducido'}
             </p>
           </div>
 

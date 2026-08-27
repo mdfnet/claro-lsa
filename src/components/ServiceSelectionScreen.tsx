@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 // Códigos de área de 3 dígitos (capitales de provincia y grandes ciudades)
 // Todo lo que no esté acá se trata como área de 4 dígitos.
@@ -100,10 +100,6 @@ type PendingQuickTouch = {
   parentTitle?: string;
 };
 
-interface ServiceSelectionScreenProps {
-  onSelectService: (service: string) => void;
-}
-
 // Hover solo en dispositivos con puntero real → no queda "pegado" en touch.
 // Feedback táctil inmediato con active:.
 const CARD_CLASS =
@@ -113,9 +109,7 @@ const CARD_CLASS =
   '[@media(hover:hover)]:hover:shadow-lg [@media(hover:hover)]:hover:scale-[1.02] ' +
   'active:scale-[0.97] active:bg-gray-100 active:border-gray-300 touch-manipulation';
 
-export default function ServiceSelectionScreen({
-  onSelectService: _onSelectService,
-}: ServiceSelectionScreenProps) {
+export default function ServiceSelectionScreen() {
   const [showHelp, setShowHelp] = useState(false);
   const [iframeModal, setIframeModal] = useState<{ initialMode: ConversationMode } | null>(null);
   const [activeQuickTouch, setActiveQuickTouch] = useState<{
@@ -137,26 +131,34 @@ export default function ServiceSelectionScreen({
   const [phoneValue, setPhoneValue] = useState('');
   // Modal de respuesta del asesor abierto SOBRE QuickTouchScreen (z-[70] > z-[60])
   const [replyModal, setReplyModal] = useState<ConversationMode | null>(null);
+  const [backSuboptions, setBackSuboptions] = useState<{ parentTitle: string; suboptions: Suboption[] } | null>(null);
 
   // Historial de conversación de la sesión actual
   const [history, setHistory] = useState<ConversationEntry[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
 
-  const addEntry = (role: ConversationEntry['role'], content: string) => {
+  // BUG-14: addEntry estable — no re-registra el postMessage listener en cada render.
+  const addEntry = useCallback((role: ConversationEntry['role'], content: string) => {
     setHistory((prev) => [...prev, { id: `${Date.now()}-${Math.random()}`, timestamp: new Date(), role, content }]);
-  };
+  }, []);
 
-  // Muestra HelpModal automáticamente la primera vez que el usuario llega a esta pantalla
+  const handleClientMessage = useCallback((msg: string) => addEntry('client', msg), [addEntry]);
+  const handleAgentMessage = useCallback((msg: string) => addEntry('agent', msg), [addEntry]);
+
+  // BUG-12: try/catch para modo incógnito iOS donde localStorage lanza.
   useEffect(() => {
-    if (!localStorage.getItem('claro-lsa-help-shown')) {
-      localStorage.setItem('claro-lsa-help-shown', '1');
-      setShowHelp(true);
-    }
+    try {
+      if (!localStorage.getItem('claro-lsa-help-shown')) {
+        localStorage.setItem('claro-lsa-help-shown', '1');
+        setShowHelp(true);
+      }
+    } catch { /* incógnito */ }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useBackHandler(showHelp, () => setShowHelp(false));
-  // El cierre del IframeModal lo maneja el propio componente con animación de salida.
+  useBackHandler(showHistory, () => { setShowHistory(false); setConfirmClear(false); });
   useBackHandler(activeQuickTouch !== null, () => setActiveQuickTouch(null));
   useBackHandler(activeSuboptions !== null, () => setActiveSuboptions(null));
   useBackHandler(showModeSelector, () => setShowModeSelector(false));
@@ -208,14 +210,18 @@ export default function ServiceSelectionScreen({
 
   const handleSuboptionTap = (sub: Suboption) => {
     const parent = activeSuboptions?.parentTitle;
+    // BUG-08: guarda las subopciones antes de limpiar para que "Elegir otra opción" pueda restaurarlas.
+    const saved = activeSuboptions;
     setActiveSuboptions(null);
     setSelectedSuboption(null);
     if (sub.goToModeSelector) {
       setShowModeSelector(true);
     } else if (sub.needsAmountInput) {
+      setBackSuboptions(saved);
       setAmountValue('');
       setAmountInput({ parentTitle: parent ?? '', needsPhoneNumber: sub.needsPhoneNumber ?? false });
     } else if (sub.speech) {
+      setBackSuboptions(saved);
       openQuickTouchOrPhone(
         { title: sub.title, speech: sub.speech, icon: MessageCircle, parentTitle: parent },
         sub.needsPhoneNumber ?? false,
@@ -350,7 +356,7 @@ export default function ServiceSelectionScreen({
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col animate-slide-in overflow-hidden" style={{ height: '100dvh' }}>
+    <div className="bg-gray-50 flex flex-col animate-slide-in overflow-hidden" style={{ height: '100dvh' }}>
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <header className="bg-white border-b border-gray-100 py-3 sm:py-4 md:py-5 flex-shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -459,7 +465,7 @@ export default function ServiceSelectionScreen({
           parentTitle={activeQuickTouch.parentTitle}
           phoneNumber={activeQuickTouch.phoneNumber}
           onClose={() => { setActiveQuickTouch(null); setReplyModal(null); }}
-          onBack={() => { setActiveQuickTouch(null); setReplyModal(null); }}
+          onBack={() => { setActiveQuickTouch(null); setActiveSuboptions(backSuboptions); }}
           showConversation
           onOpenReplyModal={() => { addEntry('agent', 'Respondió con Dillo'); setReplyModal('dillo'); }}
         />
@@ -472,8 +478,8 @@ export default function ServiceSelectionScreen({
           initialMode={replyModal}
           onClose={() => { setReplyModal(null); setActiveQuickTouch(null); }}
           zIndex="z-[70]"
-          onClientMessage={(msg) => addEntry('client', msg)}
-          onAgentMessage={(msg) => addEntry('agent', msg)}
+          onClientMessage={handleClientMessage}
+          onAgentMessage={handleAgentMessage}
           onAgentTurn={() => addEntry('agent', 'Respondió con Dillo')}
         />
       )}
@@ -482,8 +488,8 @@ export default function ServiceSelectionScreen({
         <IframeModal
           initialMode={iframeModal.initialMode}
           onClose={() => setIframeModal(null)}
-          onClientMessage={(msg) => addEntry('client', msg)}
-          onAgentMessage={(msg) => addEntry('agent', msg)}
+          onClientMessage={handleClientMessage}
+          onAgentMessage={handleAgentMessage}
           onAgentTurn={() => addEntry('agent', 'Respondió con Dillo')}
         />
       )}
@@ -622,27 +628,32 @@ export default function ServiceSelectionScreen({
 
               <button
                 onClick={confirmPhone}
-                disabled={phoneValue.replace(/\D/g, '').length < 8}
+                disabled={phoneValue.replace(/\D/g, '').length < 10}
                 className={`w-full py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-bold transition-all duration-200 touch-manipulation ${
-                  phoneValue.replace(/\D/g, '').length >= 8
+                  phoneValue.replace(/\D/g, '').length >= 10
                     ? 'bg-[#DA291C] text-white shadow-lg active:bg-[#B01F16]'
                     : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                {phoneValue.replace(/\D/g, '').length >= 8 ? 'Continuar' : 'Ingresá tu número'}
+                {phoneValue.replace(/\D/g, '').length >= 10 ? 'Continuar' : 'Ingresá tu número'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Historial de conversación */}
+      {/* Historial de conversación — BUG-11: role="dialog" */}
       {showHistory && (
-        <div className="fixed inset-0 z-[80] bg-white flex flex-col animate-fade-in">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="history-title"
+          className="fixed inset-0 z-[80] bg-white flex flex-col animate-fade-in"
+        >
           <div className="flex-shrink-0 bg-white border-b border-gray-200 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Historial de atención</h2>
+            <h2 id="history-title" className="text-lg sm:text-xl font-bold text-gray-900">Historial de atención</h2>
             <button
-              onClick={() => setShowHistory(false)}
+              onClick={() => { setShowHistory(false); setConfirmClear(false); }}
               aria-label="Cerrar historial"
               className="p-2 hover:bg-gray-100 active:bg-gray-200 rounded-full transition-colors touch-manipulation"
             >
@@ -676,13 +687,31 @@ export default function ServiceSelectionScreen({
             )}
           </div>
 
+          {/* BUG-15: confirmación en 2 pasos antes de limpiar */}
           <div className="flex-shrink-0 border-t border-gray-100 px-4 py-3">
-            <button
-              onClick={() => { setHistory([]); setShowHistory(false); }}
-              className="w-full py-3 rounded-xl text-sm font-semibold text-gray-500 border border-gray-200 active:bg-gray-50 transition-colors touch-manipulation"
-            >
-              Nueva atención (limpiar historial)
-            </button>
+            {confirmClear ? (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setHistory([]); setShowHistory(false); setConfirmClear(false); }}
+                  className="flex-1 py-3 rounded-xl text-sm font-bold text-white bg-[#DA291C] active:bg-[#B01F16] touch-manipulation"
+                >
+                  Sí, limpiar
+                </button>
+                <button
+                  onClick={() => setConfirmClear(false)}
+                  className="flex-1 py-3 rounded-xl text-sm font-bold text-gray-600 border border-gray-200 active:bg-gray-50 touch-manipulation"
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirmClear(true)}
+                className="w-full py-3 rounded-xl text-sm font-semibold text-gray-500 border border-gray-200 active:bg-gray-50 transition-colors touch-manipulation"
+              >
+                Nueva atención — limpiar historial
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -706,7 +735,7 @@ export default function ServiceSelectionScreen({
                 <div className="flex items-center bg-gray-50 border-2 border-gray-200 focus-within:border-[#DA291C] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 transition-colors">
                   <span className="text-2xl sm:text-3xl font-bold text-gray-400 mr-2">$</span>
                   <input
-                    type="number"
+                    type="text"
                     inputMode="numeric"
                     placeholder="0"
                     value={amountValue}

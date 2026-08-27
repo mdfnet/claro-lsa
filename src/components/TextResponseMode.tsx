@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Keyboard } from 'lucide-react';
 import { useBackHandler } from '../hooks/useBackHandler';
 import QuickTouchScreen from './QuickTouchScreen';
@@ -17,10 +17,14 @@ interface TextResponseModeProps {
 export default function TextResponseMode({ onSwitchToDillo, isActive = true, onMessage }: TextResponseModeProps) {
   const [text, setText] = useState('');
   const [message, setMessage] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Limpia el mensaje confirmado al cambiar de tab para que al volver arranque fresco.
+  // Limpia el mensaje al desactivarse; re-enfoca el textarea al activarse.
+  // autoFocus solo funciona en el mount inicial — el useEffect cubre los cambios de tab.
   useEffect(() => {
-    if (!isActive) { setMessage(null); setText(''); }
+    if (!isActive) { setMessage(null); setText(''); return; }
+    const t = setTimeout(() => textareaRef.current?.focus(), 50);
+    return () => clearTimeout(t);
   }, [isActive]);
 
   // Solo registra el back handler cuando este tab está visible.
@@ -55,6 +59,7 @@ export default function TextResponseMode({ onSwitchToDillo, isActive = true, onM
 
         <div className="w-full">
           <textarea
+            ref={textareaRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Escribí acá tu mensaje..."

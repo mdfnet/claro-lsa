@@ -6,8 +6,8 @@ interface HelpModalProps {
 
 export default function HelpModal({ onClose }: HelpModalProps) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+    <div role="dialog" aria-modal="true" aria-labelledby="help-title" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90dvh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
           <img
             src={`${import.meta.env.BASE_URL}icons/claro-logo-red-atlas-2.svg`}
@@ -28,7 +28,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
               <EarOff className="w-8 h-8 sm:w-10 sm:h-10 text-white" strokeWidth={2} />
             </div>
-            <h3 className="text-2xl sm:text-3xl font-black text-white mb-2">
+            <h3 id="help-title" className="text-2xl sm:text-3xl font-black text-white mb-2">
               No necesitás hablar ni escuchar
             </h3>
             <p className="text-white/90 text-base sm:text-lg">
