@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" sizes="32x32" href="%BASE_URL%icons/icon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="%BASE_URL%icons/icon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="%BASE_URL%icons/icon-180x180.png" />
+    <link rel="manifest" href="%BASE_URL%manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0" />
+    <meta name="theme-color" content="#DA291C" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Preconnect Google Fonts antes de que el browser parsee el CSS → reduce LCP en gama de entrada -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Preconnect Dillo avatar: establece TCP+TLS antes del primer mount del iframe.
+         Ahorra ~300-500 ms en redes móviles. Costo en CPU/RAM: cero. -->
+    <link rel="preconnect" href="https://avatar.dillo.ai" crossorigin />
+    <link rel="dns-prefetch" href="https://avatar.dillo.ai" />
+
+    <title>Claro · Atención inclusiva</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
