@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Check, RotateCcw, Volume2, MessageSquare, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ArrowLeft, Check, RotateCcw, Volume2, MessageSquare, X } from 'lucide-react';
 
 // Android Chrome carga las voces TTS de forma asíncrona. Llamar getVoices()
 // en el primer render devuelve array vacío en Samsung/Motorola → speak() falla
@@ -54,6 +54,7 @@ interface QuickTouchScreenProps {
   speech: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   onClose: () => void;
+  onBack?: () => void;
   parentTitle?: string;
   phoneNumber?: string;
   closeLabel?: string;
@@ -71,9 +72,10 @@ export default function QuickTouchScreen({
   closeLabel = 'Listo', closeIcon: CloseIcon = Check,
   fullScreen = true,
   showConversation = false,
-  onOpenReplyModal,
+  onOpenReplyModal, onBack,
 }: QuickTouchScreenProps) {
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const genRef = useRef(0);
 
   useEffect(() => {
     if (!fullScreen) return;
@@ -87,8 +89,12 @@ export default function QuickTouchScreen({
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
 
+    const myGen = ++genRef.current;
+
     void (async () => {
       const voices = await getVoicesAsync();
+      if (genRef.current !== myGen) return;
+
       const picked = pickSpanishVoice(voices);
 
       const utterance = new SpeechSynthesisUtterance(speech);
@@ -105,6 +111,7 @@ export default function QuickTouchScreen({
       let resumeTimer: ReturnType<typeof setInterval> | null = null;
 
       utterance.onstart = () => {
+        if (genRef.current !== myGen) return;
         setIsSpeaking(true);
         resumeTimer = setInterval(() => {
           if (window.speechSynthesis.paused) window.speechSynthesis.resume();
@@ -124,6 +131,7 @@ export default function QuickTouchScreen({
   useEffect(() => {
     playSpeech();
     return () => {
+      genRef.current++;
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
     };
@@ -153,6 +161,21 @@ export default function QuickTouchScreen({
             <X className="w-4 h-4 text-white" />
           </button>
         </div>
+
+        {/* Botón volver — izq, debajo del banner rojo */}
+        {onBack && (
+          <div className="flex-shrink-0 px-4 py-2 border-b border-gray-100 bg-white">
+            <button
+              onClick={onBack}
+              aria-label="Volver a elegir"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 active:text-gray-700
+                         py-1 px-2 rounded-lg touch-manipulation"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Elegir otra opción
+            </button>
+          </div>
+        )}
 
         {/* Mensaje principal */}
         <div className="flex-1 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>

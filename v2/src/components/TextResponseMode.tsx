@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Keyboard, ArrowRight } from 'lucide-react';
 import { useBackHandler } from '../hooks/useBackHandler';
 import QuickTouchScreen from './QuickTouchScreen';
@@ -12,6 +12,11 @@ interface TextResponseModeProps {
 export default function TextResponseMode({ onSwitchToDillo, isActive = true, onMessage }: TextResponseModeProps) {
   const [text, setText] = useState('');
   const [message, setMessage] = useState<string | null>(null);
+
+  // Limpia el mensaje confirmado al cambiar de tab para que al volver arranque fresco.
+  useEffect(() => {
+    if (!isActive) { setMessage(null); setText(''); }
+  }, [isActive]);
 
   useBackHandler(isActive && message !== null, () => { setMessage(null); setText(''); });
 

@@ -385,6 +385,7 @@ export default function ServiceSelectionScreen({
           parentTitle={activeQuickTouch.parentTitle}
           phoneNumber={activeQuickTouch.phoneNumber}
           onClose={() => { setActiveQuickTouch(null); setReplyModal(null); }}
+          onBack={() => { setActiveQuickTouch(null); setReplyModal(null); }}
           showConversation
           onOpenReplyModal={() => { addEntry('agent', 'Respondió con Dillo'); setReplyModal('dillo'); }}
         />
@@ -396,6 +397,8 @@ export default function ServiceSelectionScreen({
           onClose={() => { setReplyModal(null); setActiveQuickTouch(null); }}
           zIndex="z-[70]"
           onClientMessage={(msg) => addEntry('client', msg)}
+          onAgentMessage={(msg) => addEntry('agent', msg)}
+          onAgentTurn={() => addEntry('agent', 'Respondió con Dillo')}
         />
       )}
 
@@ -404,6 +407,8 @@ export default function ServiceSelectionScreen({
           initialMode={iframeModal.initialMode}
           onClose={() => setIframeModal(null)}
           onClientMessage={(msg) => addEntry('client', msg)}
+          onAgentMessage={(msg) => addEntry('agent', msg)}
+          onAgentTurn={() => addEntry('agent', 'Respondió con Dillo')}
         />
       )}
 

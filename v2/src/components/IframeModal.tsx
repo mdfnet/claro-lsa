@@ -17,6 +17,8 @@ interface IframeModalProps {
   onClose: () => void;
   zIndex?: string;
   onClientMessage?: (msg: string) => void;
+  onAgentMessage?: (msg: string) => void;
+  onAgentTurn?: () => void;
 }
 
 function getHandsUrl() {
@@ -37,7 +39,7 @@ const TABS: { mode: ConversationMode; label: string; shortLabel: string; Icon: t
   { mode: 'text',  label: 'Escribir',           shortLabel: 'Texto', Icon: Keyboard },
 ];
 
-export default function IframeModal({ initialMode, onClose, zIndex = 'z-50', onClientMessage }: IframeModalProps) {
+export default function IframeModal({ initialMode, onClose, zIndex = 'z-50', onClientMessage, onAgentMessage, onAgentTurn }: IframeModalProps) {
   const [activeMode, setActiveMode] = useState<ConversationMode>(initialMode);
   const [isClosing, setIsClosing] = useState(false);
   const [handsLoaded, setHandsLoaded] = useState(false);
@@ -46,6 +48,7 @@ export default function IframeModal({ initialMode, onClose, zIndex = 'z-50', onC
   const [dilloMounted, setDilloMounted] = useState(initialMode === 'dillo');
 
   const handsUrl = useRef(getHandsUrl()).current;
+  const prevModeRef = useRef(initialMode);
   const requestClose = useCallback(() => setIsClosing(true), []);
   useBackHandler(true, requestClose);
 
@@ -54,6 +57,15 @@ export default function IframeModal({ initialMode, onClose, zIndex = 'z-50', onC
     if (activeMode === 'dillo') setDilloMounted(true);
   }, [activeMode]);
 
+  // Notifica al padre cuando el asesor CAMBIA al tab Dillo (no en el render inicial)
+  useEffect(() => {
+    if (activeMode === 'dillo' && prevModeRef.current !== 'dillo') {
+      onAgentTurn?.();
+    }
+    prevModeRef.current = activeMode;
+  }, [activeMode, onAgentTurn]);
+
+  // avatar.dillo.ai = mensajes del asesor; entrenar.dillo.ar = transcripción del cliente.
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       const knownOrigins = ['https://avatar.dillo.ai', 'https://entrenar.dillo.ar'];
@@ -64,12 +76,18 @@ export default function IframeModal({ initialMode, onClose, zIndex = 'z-50', onC
         typeof e.data?.text === 'string' ? e.data.text :
         typeof e.data?.transcript === 'string' ? e.data.transcript :
         typeof e.data?.message === 'string' ? e.data.message :
+        typeof e.data?.content === 'string' ? e.data.content :
         null;
-      if (text && text.trim()) onClientMessage?.(text.trim());
+      if (!text?.trim()) return;
+      if (e.origin.startsWith('https://avatar.dillo.ai')) {
+        onAgentMessage?.(text.trim());
+      } else {
+        onClientMessage?.(text.trim());
+      }
     };
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
-  }, [onClientMessage]);
+  }, [onClientMessage, onAgentMessage]);
 
   useEffect(() => {
     const widget = document.querySelector('dillo-interpreter');
