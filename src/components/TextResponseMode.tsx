@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Keyboard } from 'lucide-react';
 import { useBackHandler } from '../hooks/useBackHandler';
 import QuickTouchScreen from './QuickTouchScreen';
@@ -18,8 +18,12 @@ export default function TextResponseMode({ onSwitchToDillo, isActive = true, onM
   const [text, setText] = useState('');
   const [message, setMessage] = useState<string | null>(null);
 
+  // Limpia el mensaje confirmado al cambiar de tab para que al volver arranque fresco.
+  useEffect(() => {
+    if (!isActive) { setMessage(null); setText(''); }
+  }, [isActive]);
+
   // Solo registra el back handler cuando este tab está visible.
-  // Si está oculto (CSS display:none pero montado), no debe interceptar el back del IframeModal.
   useBackHandler(isActive && message !== null, () => { setMessage(null); setText(''); });
 
   if (message) {

@@ -9,8 +9,9 @@ interface IframeModalProps {
   initialMode: ConversationMode;
   onClose: () => void;
   zIndex?: string;
-  // Notifica al padre cuando el cliente envía un mensaje de texto (para historial)
   onClientMessage?: (msg: string) => void;
+  onAgentMessage?: (msg: string) => void;
+  onAgentTurn?: () => void;
 }
 
 function getHandsUrl() {
@@ -24,51 +25,61 @@ const MODE_TOGGLES: { mode: ConversationMode; label: string; Icon: typeof Hand }
   { mode: 'text', label: 'Responder con texto', Icon: Keyboard },
 ];
 
-export default function IframeModal({ initialMode, onClose, zIndex = 'z-50', onClientMessage }: IframeModalProps) {
+export default function IframeModal({ initialMode, onClose, zIndex = 'z-50', onClientMessage, onAgentMessage, onAgentTurn }: IframeModalProps) {
   const [activeMode, setActiveMode] = useState<ConversationMode>(initialMode);
   const [isClosing, setIsClosing] = useState(false);
   const [handsLoaded, setHandsLoaded] = useState(false);
   const [dilloLoaded, setDilloLoaded] = useState(false);
-  // Lazy mount: cada iframe se monta la primera vez que se activa su tab.
-  // Una vez montado, permanece en el DOM (CSS display:none) para no recargar.
   const [handsMounted, setHandsMounted] = useState(initialMode === 'hands');
   const [dilloMounted, setDilloMounted] = useState(initialMode === 'dillo');
 
-  // URL generada una sola vez al montar — no cambia al alternar tabs.
   const handsUrl = useRef(getHandsUrl()).current;
+  const prevModeRef = useRef(initialMode);
 
   const requestClose = useCallback(() => setIsClosing(true), []);
 
   useBackHandler(true, requestClose);
 
-  // Monta el iframe la primera vez que se activa su tab
   useEffect(() => {
     if (activeMode === 'hands') setHandsMounted(true);
     if (activeMode === 'dillo') setDilloMounted(true);
   }, [activeMode]);
 
-  // Escucha mensajes postMessage que los iframes de Dillo puedan enviar.
-  // Logueamos todo para poder verificar en consola qué formato usan.
+  // Notifica al padre cuando el asesor CAMBIA al tab Dillo (no en el render inicial)
+  useEffect(() => {
+    if (activeMode === 'dillo' && prevModeRef.current !== 'dillo') {
+      onAgentTurn?.();
+    }
+    prevModeRef.current = activeMode;
+  }, [activeMode, onAgentTurn]);
+
+  // Escucha mensajes postMessage de los iframes de Dillo.
+  // avatar.dillo.ai = mensajes del asesor; entrenar.dillo.ar = transcripción del cliente.
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       const knownOrigins = ['https://avatar.dillo.ai', 'https://entrenar.dillo.ar'];
       if (!knownOrigins.some((o) => e.origin.startsWith(o))) return;
       console.log('[Dillo postMessage]', e.origin, e.data);
 
-      // Si el iframe envía el texto traducido/dictado, notificamos al padre.
-      // Ajustar el selector de `e.data` según el formato real que Dillo use.
       const text =
         typeof e.data === 'string' ? e.data :
         typeof e.data?.text === 'string' ? e.data.text :
         typeof e.data?.transcript === 'string' ? e.data.transcript :
         typeof e.data?.message === 'string' ? e.data.message :
+        typeof e.data?.content === 'string' ? e.data.content :
         null;
 
-      if (text && text.trim()) onClientMessage?.(text.trim());
+      if (!text?.trim()) return;
+
+      if (e.origin.startsWith('https://avatar.dillo.ai')) {
+        onAgentMessage?.(text.trim());
+      } else {
+        onClientMessage?.(text.trim());
+      }
     };
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
-  }, [onClientMessage]);
+  }, [onClientMessage, onAgentMessage]);
 
   return (
     <div
