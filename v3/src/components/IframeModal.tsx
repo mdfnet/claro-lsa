@@ -175,7 +175,7 @@ export default function IframeModal({
               >
                 {/* BUG-04: wrapper overflow-hidden contiene el scale-[1.8] del LSAHandIcon.
                     onDark solo se pasa a LSAHandIcon (tab hands); Lucide no lo acepta → warning. */}
-                <div className="w-5 h-5 flex-shrink-0 overflow-hidden flex items-center justify-center">
+                <div className="w-9 h-8 flex-shrink-0 overflow-hidden flex items-center justify-center">
                   {mode === 'hands'
                     ? <Icon className="w-5 h-5" onDark={activeMode === mode} />
                     : <Icon className="w-5 h-5" strokeWidth={2.5} />
@@ -302,7 +302,7 @@ export default function IframeModal({
             />
           )}
           <HandoffBar
-            label="← El cliente responde"
+            label="El cliente responde →"
             variant="red"
             onClick={() => setActiveMode('text')}
           />

@@ -74,7 +74,7 @@ export default function QuickTouchScreen({
   showConversation = false,
   onOpenReplyModal, onBack,
 }: QuickTouchScreenProps) {
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [audioState, setAudioState] = useState<'pending' | 'speaking' | 'done'>('pending');
   const genRef = useRef(0);
 
   useEffect(() => {
@@ -112,13 +112,13 @@ export default function QuickTouchScreen({
 
       utterance.onstart = () => {
         if (genRef.current !== myGen) return;
-        setIsSpeaking(true);
+        setAudioState('speaking');
         resumeTimer = setInterval(() => {
           if (window.speechSynthesis.paused) window.speechSynthesis.resume();
         }, 5000);
       };
       const cleanup = () => {
-        setIsSpeaking(false);
+        setAudioState('done');
         if (resumeTimer) { clearInterval(resumeTimer); resumeTimer = null; }
       };
       utterance.onend = cleanup;
@@ -129,11 +129,12 @@ export default function QuickTouchScreen({
   }, [speech]);
 
   useEffect(() => {
+    setAudioState('pending');
     playSpeech();
     return () => {
       genRef.current++;
       window.speechSynthesis.cancel();
-      setIsSpeaking(false);
+      setAudioState('pending');
     };
   }, [playSpeech]);
 
@@ -201,7 +202,7 @@ export default function QuickTouchScreen({
             </div>
 
             {/* Indicador de audio */}
-            <AudioIndicator isSpeaking={isSpeaking} />
+            <AudioIndicator audioState={audioState} />
 
           </div>
         </div>
@@ -262,7 +263,7 @@ export default function QuickTouchScreen({
             </h1>
           </div>
 
-          <AudioIndicator isSpeaking={isSpeaking} />
+          <AudioIndicator audioState={audioState} />
 
         </div>
       </div>
@@ -305,7 +306,8 @@ export default function QuickTouchScreen({
   );
 }
 
-function AudioIndicator({ isSpeaking }: { isSpeaking: boolean }) {
+function AudioIndicator({ audioState }: { audioState: 'pending' | 'speaking' | 'done' }) {
+  const isSpeaking = audioState === 'speaking';
   return (
     <div className="flex flex-col items-center gap-2">
       <div className={`relative w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${
@@ -337,7 +339,7 @@ function AudioIndicator({ isSpeaking }: { isSpeaking: boolean }) {
       </div>
 
       <p className="text-xs sm:text-sm text-gray-400 font-medium">
-        {isSpeaking ? 'Reproduciendo…' : 'Mensaje reproducido'}
+        {audioState === 'pending' ? 'Preparando audio…' : isSpeaking ? 'Reproduciendo…' : 'Mensaje reproducido'}
       </p>
     </div>
   );
