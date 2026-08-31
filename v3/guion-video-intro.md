@@ -22,8 +22,7 @@
 | 5 | YO | `yo` ✅ |
 | 6 | INTÉRPRETE | `interprete` ✅ |
 | 7 | LENGUA DE SEÑAS | `lengua_de_señas` ✅ |
-| 8 | ATENCIÓN | `atencion` ✅ |
-| 9 | CLARO | `claro` ✅ |
+| 8 | ATENCIÓN | `aplicacion` ✅ |
 
 ---
 
@@ -31,6 +30,7 @@
 
 | # | Concepto | Key en AnimationsMap |
 |---|---|---|
+| 9 | YO | `yo` ✅ |
 | 10 | AYUDAR | `ayudar` ✅ |
 | 11 | SORDOS / SORDAS | `sordos` ✅ |
 | 12 | ACÁ | `aca` ✅ |
@@ -60,6 +60,8 @@
 | 22 | MOSTRALE LA PANTALLA | `mostrale_la_pantalla` ✅ |
 | 23 | EMPLEADO | `empleado` ✅ |
 | 24 | ATENDER | `atender` ✅ |
+| 25 | MENSAJE | `mensaje` ✅ |
+| 26 | QUIERAS | `quiero` ✅ |
 
 ---
 
@@ -67,8 +69,8 @@
 
 | # | Concepto | Key en AnimationsMap |
 |---|---|---|
-| 25 | GRACIAS | `gracias` ✅ |
-| 26 | HASTA PRONTO | `hasta_pronto` ✅ |
+| 27 | GRACIAS | `gracias` ✅ |
+| 28 | HASTA PRONTO | `hasta_pronto` ✅ |
 
 ---
 

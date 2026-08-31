@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  base: process.env.BASE_PATH || '/clarodev3/',
+  base: process.env.BASE_PATH || '/claro/',
   plugins: [react()],
   publicDir: path.resolve(__dirname, '../public'),
   optimizeDeps: {

@@ -35,7 +35,7 @@ import {
   MessageCircle, Smartphone, CreditCard, Headphones,
   FileText, HelpCircle, ShoppingCart, DollarSign, Package,
   RefreshCw, AlertCircle, ChevronLeft, ChevronRight, Keyboard,
-  History, X, Clock, Phone,
+  History, X, Clock, Phone, Video,
 } from 'lucide-react';
 import { LSAHandIcon } from './LSAHandIcon';
 import { useBackHandler } from '../hooks/useBackHandler';
@@ -103,6 +103,7 @@ export default function ServiceSelectionScreen() {
   const [backSuboptions, setBackSuboptions] = useState<{ parentTitle: string; suboptions: Suboption[] } | null>(null);
   const [history, setHistory] = useState<ConversationEntry[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [showIntroVideo, setShowIntroVideo] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
   const [dilloPrewarmMounted, setDilloPrewarmMounted] = useState(false);
 
@@ -275,6 +276,16 @@ export default function ServiceSelectionScreen() {
             className="h-6 sm:h-8"
           />
           <div className="flex items-center gap-2 flex-shrink-0">
+
+            <button
+              onClick={() => setShowIntroVideo(true)}
+              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center
+                         bg-gray-100 active:bg-gray-200 rounded-xl transition-colors touch-manipulation
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+              aria-label="Ver video introductorio"
+            >
+              <Video className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+            </button>
 
             <button
               onClick={() => setShowHistory(true)}
@@ -746,6 +757,31 @@ export default function ServiceSelectionScreen() {
           tabIndex={-1}
           allow="camera; microphone"
         />
+      )}
+
+      {showIntroVideo && (
+        <div className="fixed inset-0 z-[90] bg-black flex flex-col animate-fade-in">
+          <video
+            src="https://dillo.ar/videos/Intro-Claro_1.mp4"
+            className="w-full h-[100dvh] object-contain"
+            controls
+            playsInline
+            autoPlay
+            onEnded={() => setShowIntroVideo(false)}
+          />
+          <div className="absolute bottom-6 right-4 z-10">
+            <button
+              onClick={() => setShowIntroVideo(false)}
+              className="bg-black/50 backdrop-blur-sm text-white px-6 py-3 rounded-xl text-base font-bold
+                         border border-white/20
+                         active:scale-95 transition-transform duration-150
+                         flex items-center gap-2 touch-manipulation"
+            >
+              Saltar
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
       )}
 
     </div>

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useBackButtonNavigation, useBackHandler } from './hooks/useBackHandler';
 import WelcomeScreen from './components/WelcomeScreen';
+import VideoIntroScreen from './components/VideoIntroScreen';
 import ServiceSelectionScreen from './components/ServiceSelectionScreen';
 import { preloadVoices } from './components/QuickTouchScreen';
 
-type Screen = 'welcome' | 'services';
+type Screen = 'welcome' | 'video-intro' | 'services';
 
 function useThemeColor(color: string) {
   useEffect(() => {
@@ -37,8 +38,9 @@ function useSpeechUnlock() {
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
 
-  useThemeColor(currentScreen === 'welcome' ? '#DA291C' : '#ffffff');
+  useThemeColor(currentScreen === 'services' ? '#ffffff' : '#DA291C');
   useBackButtonNavigation();
+  useBackHandler(currentScreen === 'video-intro', () => setCurrentScreen('welcome'));
   useBackHandler(currentScreen === 'services', () => setCurrentScreen('welcome'));
   useSpeechUnlock();
 
@@ -49,7 +51,13 @@ function App() {
   return (
     <div className="min-h-screen">
       {currentScreen === 'welcome' && (
-        <WelcomeScreen onStart={() => setCurrentScreen('services')} />
+        <WelcomeScreen onStart={() => setCurrentScreen('video-intro')} />
+      )}
+      {currentScreen === 'video-intro' && (
+        <VideoIntroScreen
+          onFinish={() => setCurrentScreen('services')}
+          onSkip={() => setCurrentScreen('services')}
+        />
       )}
       {currentScreen === 'services' && (
         <ServiceSelectionScreen />
