@@ -15,7 +15,7 @@ interface IframeModalProps {
 }
 
 function getHandsUrl() {
-  return `https://entrenar.dillo.ar/#/traductor?model=/models/Modelo_Claro_LSA.json&t=${Date.now()}`;
+  return `https://entrenar.dillo.ar/#/traductor?model=/models/Modelo_Claro_LSA_0709.json&t=${Date.now()}`;
 }
 const DILLO_URL = 'https://avatar.dillo.ai/?embed=1';
 
