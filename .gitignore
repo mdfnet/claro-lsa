@@ -29,3 +29,5 @@ build dev/
 *.sln
 *.sw?
 .env
+.claude-flow/
+distDev/

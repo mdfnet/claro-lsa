@@ -52,6 +52,11 @@ export const SUBOPCIONES_PROBLEMA_FACTURA: Suboption[] = [
   { id: 'baja-servicio', title: 'Dar de baja un servicio', speech: 'Quiero dar de baja un servicio que estoy pagando',  needsPhoneNumber: true },
 ];
 
+export const SUBOPCIONES_FACTURACION: Suboption[] = [
+  ...SUBOPCIONES_FACTURA,
+  ...SUBOPCIONES_PROBLEMA_FACTURA,
+];
+
 export const SUBOPCIONES_SOPORTE: Suboption[] = [
   { id: 'no-signal',         title: 'Sin señal',            speech: 'No tengo señal en mi celular',                   needsPhoneNumber: true },
   { id: 'internet-slow',     title: 'Internet lento',       speech: 'Mi internet está muy lento',                     needsPhoneNumber: true },

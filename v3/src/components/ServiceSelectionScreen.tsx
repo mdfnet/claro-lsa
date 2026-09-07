@@ -33,8 +33,8 @@ function formatArgentinePhone(raw: string): string {
 
 import {
   MessageCircle, Smartphone, CreditCard, Headphones,
-  FileText, HelpCircle, ShoppingCart, DollarSign, Package,
-  RefreshCw, AlertCircle, ChevronLeft, ChevronRight, Keyboard,
+  FileText, HelpCircle, ShoppingCart,
+  ChevronLeft, ChevronRight, Keyboard,
   History, X, Clock, Phone, Video,
 } from 'lucide-react';
 import { LSAHandIcon } from './LSAHandIcon';
@@ -45,11 +45,8 @@ import QuickTouchScreen from './QuickTouchScreen';
 import {
   type Suboption,
   MARCAS_PARA_COMPRA,
-  MARCAS_PARA_CAMBIO,
   SUBOPCIONES_PLANES,
-  SUBOPCIONES_RECARGA,
-  SUBOPCIONES_FACTURA,
-  SUBOPCIONES_PROBLEMA_FACTURA,
+  SUBOPCIONES_FACTURACION,
   SUBOPCIONES_SOPORTE,
 } from '../data/catalogos';
 
@@ -161,7 +158,11 @@ export default function ServiceSelectionScreen() {
   useBackHandler(activeSuboptions !== null, () => setActiveSuboptions(null));
   useBackHandler(showModeSelector, () => setShowModeSelector(false));
   useBackHandler(amountInput !== null, () => { setAmountInput(null); setAmountValue(''); });
-  useBackHandler(phoneInput !== null, () => { setPhoneInput(null); setPhoneValue(''); });
+  useBackHandler(phoneInput !== null, () => {
+    setPhoneInput(null);
+    setPhoneValue('');
+    if (backSuboptions) { setActiveSuboptions(backSuboptions); setBackSuboptions(null); }
+  });
 
   const activateQuickTouch = (data: {
     title: string;
@@ -198,12 +199,14 @@ export default function ServiceSelectionScreen() {
   };
 
   const handleSuboptionTap = (sub: Suboption) => {
+    if (sub.goToModeSelector) {
+      setShowModeSelector(true);
+      return;
+    }
     const parent = activeSuboptions?.parentTitle;
     const saved = activeSuboptions;
     setActiveSuboptions(null);
-    if (sub.goToModeSelector) {
-      setShowModeSelector(true);
-    } else if (sub.needsAmountInput) {
+    if (sub.needsAmountInput) {
       // BUG-08: backSuboptions también se setea en el path amountInput,
       // para que "Elegir otra opción" restaure subopciones correctamente.
       setBackSuboptions(saved);
@@ -244,6 +247,7 @@ export default function ServiceSelectionScreen() {
 
   const openIframe = (mode: ConversationMode) => {
     setShowModeSelector(false);
+    setActiveSuboptions(null);
     setIframeModal({ initialMode: mode });
   };
 
@@ -551,7 +555,11 @@ export default function ServiceSelectionScreen() {
         >
           <OverlayHeader
             title="Número de línea"
-            onBack={() => { setPhoneInput(null); setPhoneValue(''); }}
+            onBack={() => {
+              setPhoneInput(null);
+              setPhoneValue('');
+              if (backSuboptions) { setActiveSuboptions(backSuboptions); setBackSuboptions(null); }
+            }}
             titleId="phone-input-title"
           />
 
@@ -762,7 +770,7 @@ export default function ServiceSelectionScreen() {
       {showIntroVideo && (
         <div className="fixed inset-0 z-[90] bg-black flex flex-col animate-fade-in">
           <video
-            src="https://dillo.ar/videos/Intro-Claro_1.mp4"
+            src="https://dillo.ar/videos/Intro-Claro_2.mp4"
             className="w-full h-[100dvh] object-contain"
             controls
             playsInline
@@ -791,15 +799,11 @@ export default function ServiceSelectionScreen() {
 // ── Datos de servicios ────────────────────────────────────────────────────────
 
 const QUICK_TOUCH_SERVICES: QuickTouchService[] = [
-  { id: 'buy-phone',         title: 'Comprar un celular',      icon: Smartphone,   suboptions: MARCAS_PARA_COMPRA },
-  { id: 'upgrade-phone',     title: 'Cambiar de equipo',       icon: RefreshCw,    suboptions: MARCAS_PARA_CAMBIO },
-  { id: 'phone-plans',       title: 'Ver planes',              icon: ShoppingCart, suboptions: SUBOPCIONES_PLANES },
-  { id: 'recharge',          title: 'Recargar saldo',          icon: Package,      suboptions: SUBOPCIONES_RECARGA },
-  { id: 'check-balance',     title: 'Consultar saldo',         icon: DollarSign,   speech: 'Quiero consultar mi saldo disponible', needsPhoneNumber: true },
-  { id: 'pay-bill',          title: 'Pagar mi factura',        icon: CreditCard,   suboptions: SUBOPCIONES_FACTURA },
-  { id: 'billing-issue',     title: 'Problema de facturación', icon: AlertCircle,  suboptions: SUBOPCIONES_PROBLEMA_FACTURA },
-  { id: 'technical-support', title: 'Soporte técnico',         icon: Headphones,   suboptions: SUBOPCIONES_SOPORTE },
-  { id: 'other-procedure',   title: 'Otro trámite',            icon: FileText,     goToModeSelector: true },
+  { id: 'buy-phone',         title: 'Comprar un celular', icon: Smartphone,   suboptions: MARCAS_PARA_COMPRA },
+  { id: 'billing',           title: 'Facturación',        icon: CreditCard,   suboptions: SUBOPCIONES_FACTURACION },
+  { id: 'phone-plans',       title: 'Ver planes',         icon: ShoppingCart, suboptions: SUBOPCIONES_PLANES },
+  { id: 'technical-support', title: 'Soporte técnico',    icon: Headphones,   suboptions: SUBOPCIONES_SOPORTE },
+  { id: 'other-procedure',   title: 'Otras gestiones',    icon: FileText,     goToModeSelector: true },
 ];
 
 const CARD_CLASS =

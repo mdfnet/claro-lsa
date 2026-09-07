@@ -1,7 +1,7 @@
 import { Play, SkipForward } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
-const VIDEO_URL = 'https://dillo.ar/videos/Intro-Claro_1.mp4';
+const VIDEO_URL = 'https://dillo.ar/videos/Intro-Claro_2.mp4';
 
 interface VideoIntroScreenProps {
   onFinish: () => void;
@@ -11,6 +11,12 @@ interface VideoIntroScreenProps {
 export default function VideoIntroScreen({ onFinish, onSkip }: VideoIntroScreenProps) {
   const [phase, setPhase] = useState<'preview' | 'playing'>('preview');
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    document.body.style.backgroundColor = '#000000';
+    return () => { document.body.style.backgroundColor = ''; };
+  }, [phase]);
 
   const handlePlay = () => {
     setPhase('playing');

@@ -7,10 +7,11 @@ import { preloadVoices } from './components/QuickTouchScreen';
 
 type Screen = 'welcome' | 'video-intro' | 'services';
 
-function useThemeColor(color: string) {
+function useThemeColor(themeColor: string, bodyColor: string) {
   useEffect(() => {
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color);
-  }, [color]);
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
+    document.body.style.backgroundColor = bodyColor;
+  }, [themeColor, bodyColor]);
 }
 
 // iOS Safari requiere que speechSynthesis.speak() ocurra dentro del contexto
@@ -38,7 +39,11 @@ function useSpeechUnlock() {
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
 
-  useThemeColor(currentScreen === 'services' ? '#ffffff' : '#DA291C');
+  const screenBodyColor =
+    currentScreen === 'welcome'     ? '#D9291C' :
+    currentScreen === 'video-intro' ? '#D9291C' :
+                                      '#ffffff';
+  useThemeColor(currentScreen === 'services' ? '#ffffff' : '#DA291C', screenBodyColor);
   useBackButtonNavigation();
   useBackHandler(currentScreen === 'video-intro', () => setCurrentScreen('welcome'));
   useBackHandler(currentScreen === 'services', () => setCurrentScreen('welcome'));
