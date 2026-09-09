@@ -1,4 +1,4 @@
-import { X, MessageCircle, Keyboard, User, UserCheck, AlertCircle } from 'lucide-react';
+import { X, MessageCircle, Keyboard, User, UserCheck, AlertCircle, Menu, Check } from 'lucide-react';
 import { LSAHandIcon } from './LSAHandIcon';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useBackHandler } from '../hooks/useBackHandler';
@@ -27,7 +27,7 @@ const TAB_OWNER: Record<ConversationMode, 'client' | 'agent'> = {
 
 const TABS: { mode: ConversationMode; label: string; shortLabel: string; Icon: React.ComponentType<any> }[] = [
   { mode: 'hands', label: 'Mis señas',          shortLabel: 'Señas', Icon: LSAHandIcon },
-  { mode: 'dillo', label: 'El asesor responde', shortLabel: 'Dillo', Icon: MessageCircle },
+  { mode: 'dillo', label: 'Con Dillo',          shortLabel: 'Dillo', Icon: MessageCircle },
   { mode: 'text',  label: 'Escribir',           shortLabel: 'Texto', Icon: Keyboard },
 ];
 
@@ -45,6 +45,7 @@ export default function IframeModal({
   const [dilloRetryKey, setDilloRetryKey] = useState(0);
   const [handsMounted, setHandsMounted] = useState(initialMode === 'hands');
   const [dilloMounted, setDilloMounted] = useState(initialMode === 'dillo');
+  const [showTabMenu, setShowTabMenu] = useState(false);
 
   // BUG-03: URL regenerada en cada retry para forzar reload del iframe.
   const handsUrl = useMemo(() => getHandsUrl(), [handsRetryKey]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -61,6 +62,7 @@ export default function IframeModal({
 
   const requestClose = useCallback(() => setIsClosing(true), []);
   useBackHandler(true, requestClose);
+  useBackHandler(showTabMenu, () => setShowTabMenu(false));
 
   useEffect(() => {
     if (!isClosing) return;
@@ -144,95 +146,117 @@ export default function IframeModal({
       } transition-opacity duration-150`}
       onTransitionEnd={() => { if (isClosing) doClose(); }}
     >
-      {/* ── Header ─────────────────────────────────────────────────────────────── */}
-      {/* absolute (no flex-shrink:0 + normal flow) a propósito: como flex
-          child reservaba su alto del modal completo, achicando el panel de
-          contenido de abajo (y con él el <iframe> del avatar, que renderiza
-          más chico cuanta menos altura tenga su caja). Flotando por encima,
-          el panel de contenido pasa a ocupar el 100% del modal - el trade-off
-          es que este header ahora tapa lo que haya en la parte superior de
-          cada iframe (logo/cabeza del avatar en el caso de Dillo) en vez de
-          empujarlo hacia abajo. */}
-      <div className="absolute top-0 left-0 right-0 z-20 bg-white border-b border-gray-200">
+      {/* ── Header compacto ────────────────────────────────────────────────────── */}
+      <div
+        key={owner}
+        className={`absolute top-0 left-0 right-0 z-20 flex items-center gap-2 px-2 py-2.5 animate-turn-in ${
+          owner === 'client' ? 'bg-brand/8' : 'bg-gray-900'
+        }`}
+      >
+        {owner === 'client'
+          ? <User className="w-4 h-4 text-brand flex-shrink-0 ml-1" strokeWidth={2.5} />
+          : <UserCheck className="w-4 h-4 text-white flex-shrink-0 ml-1" strokeWidth={2.5} />
+        }
+        <span className={`flex-1 text-sm font-black uppercase tracking-widest ${
+          owner === 'client' ? 'text-brand' : 'text-white'
+        }`}>
+          {owner === 'client' ? 'Tu turno' : 'Turno del asesor'}
+        </span>
 
-        {/* BUG-10: Patrón ARIA Tabs correcto: role="tablist" + role="tab" + aria-selected */}
-        <div className="flex items-center justify-between px-2 py-2 gap-2">
-          <div
-            role="tablist"
-            aria-label="Modos de conversación"
-            className="flex items-center bg-gray-100 rounded-xl p-1 gap-0.5 min-w-0 flex-1"
-          >
-            {TABS.map(({ mode, label, shortLabel, Icon }) => (
-              <button
-                key={mode}
-                role="tab"
-                id={`iframe-tab-${mode}`}
-                aria-controls={`iframe-panel-${mode}`}
-                onClick={() => setActiveMode(mode)}
-                aria-label={label}
-                aria-selected={activeMode === mode}
-                className={`flex flex-col items-center justify-center gap-0.5 py-2 px-1 rounded-lg
-                            text-[11px] font-bold transition-all touch-manipulation flex-1 min-w-0
-                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 ${
-                  activeMode === mode
-                    ? mode === 'dillo'
-                      ? 'bg-gray-900 text-white shadow-sm focus-visible:ring-gray-900'
-                      : 'bg-brand text-white shadow-sm focus-visible:ring-brand'
-                    : 'text-gray-500 active:bg-gray-200 focus-visible:ring-gray-400'
-                }`}
-              >
-                {/* BUG-04: wrapper overflow-hidden contiene el scale-[1.8] del LSAHandIcon.
-                    onDark solo se pasa a LSAHandIcon (tab hands); Lucide no lo acepta → warning. */}
-                <div className="w-8 h-8 flex-shrink-0 overflow-hidden flex items-center justify-center">
-                  {mode === 'hands'
-                    ? <Icon className="w-5 h-5" onDark={activeMode === mode} />
-                    : <Icon className="w-5 h-5" strokeWidth={2.5} />
-                  }
-                </div>
-                <span className="leading-none">{shortLabel}</span>
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={requestClose}
-            aria-label="Volver al inicio"
-            className="flex items-center justify-center w-11 h-11 bg-gray-100 active:bg-gray-200
-                       rounded-xl transition-colors touch-manipulation flex-shrink-0
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1"
-          >
-            <X className="w-5 h-5 text-gray-700" />
-          </button>
-        </div>
-
-        <div
-          key={owner}
-          className={`px-4 py-3 flex items-center justify-center gap-2.5 animate-turn-in ${
+        <button
+          onClick={() => setShowTabMenu(true)}
+          aria-label="Cambiar modo"
+          className={`w-10 h-10 flex items-center justify-center rounded-xl touch-manipulation
+                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 ${
             owner === 'client'
-              ? 'bg-brand/8 text-brand'
-              : 'bg-gray-900 text-white'
+              ? 'bg-brand/10 active:bg-brand/20 focus-visible:ring-brand'
+              : 'bg-white/10 active:bg-white/20 focus-visible:ring-white'
           }`}
         >
-          {owner === 'client'
-            ? <User className="w-4 h-4 flex-shrink-0" strokeWidth={2.5} />
-            : <UserCheck className="w-4 h-4 flex-shrink-0" strokeWidth={2.5} />
-          }
-          <span className="text-sm font-black uppercase tracking-widest">
-            {owner === 'client' ? 'Tu turno' : 'Turno del asesor'}
-          </span>
-        </div>
+          <Menu className={`w-5 h-5 ${owner === 'client' ? 'text-brand' : 'text-white'}`} />
+        </button>
 
+        <button
+          onClick={requestClose}
+          aria-label="Volver al inicio"
+          className={`w-10 h-10 flex items-center justify-center rounded-xl touch-manipulation
+                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 ${
+            owner === 'client'
+              ? 'bg-brand/10 active:bg-brand/20 focus-visible:ring-brand'
+              : 'bg-white/10 active:bg-white/20 focus-visible:ring-white'
+          }`}
+        >
+          <X className={`w-5 h-5 ${owner === 'client' ? 'text-brand' : 'text-white'}`} />
+        </button>
       </div>
+
+      {/* ── Bottom sheet: selector de modo ─────────────────────────────────────── */}
+      {showTabMenu && (
+        <div
+          className="absolute inset-0 z-30 bg-black/40 flex items-end animate-fade-in"
+          onClick={() => setShowTabMenu(false)}
+        >
+          <div
+            className="w-full bg-white rounded-t-3xl px-4 pt-5 pb-10 animate-sheet-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">
+              Comunicarse
+            </p>
+            <div className="space-y-2" role="tablist" aria-label="Modos de conversación">
+              {TABS.map(({ mode, label, shortLabel: _s, Icon }) => {
+                const isActive = activeMode === mode;
+                return (
+                  <button
+                    key={mode}
+                    role="tab"
+                    id={`iframe-tab-${mode}`}
+                    aria-controls={`iframe-panel-${mode}`}
+                    aria-selected={isActive}
+                    onClick={() => { setActiveMode(mode); setShowTabMenu(false); }}
+                    className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl border-2 transition-all
+                                touch-manipulation active:scale-[0.98]
+                                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
+                      isActive
+                        ? mode === 'dillo'
+                          ? 'bg-gray-900 border-gray-900 focus-visible:ring-gray-900'
+                          : 'bg-brand border-brand focus-visible:ring-brand'
+                        : 'bg-white border-gray-100 active:border-brand/30 focus-visible:ring-gray-400'
+                    }`}
+                  >
+                    {/* BUG-04: overflow-hidden contiene scale-[1.8] del LSAHandIcon */}
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden ${
+                      isActive ? 'bg-white/20' : 'bg-brand/10'
+                    }`}>
+                      {mode === 'hands'
+                        ? <Icon className="w-7 h-7" onDark={isActive} />
+                        : <Icon className={`w-6 h-6 ${isActive ? 'text-white' : 'text-brand'}`} strokeWidth={2.5} />
+                      }
+                    </div>
+                    <span className={`flex-1 text-left font-black text-base ${isActive ? 'text-white' : 'text-gray-900'}`}>
+                      {label}
+                    </span>
+                    {isActive && <Check className="w-5 h-5 text-white flex-shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Contenido ──────────────────────────────────────────────────────────── */}
       <div className="flex-1 relative overflow-hidden">
 
         {/* BUG-10: role="tabpanel" con id y aria-labelledby en cada panel */}
+        {/* text y hands: top-[60px] para no quedar tapados por el header flotante.
+            dillo: inset-0 a propósito — el header tapa el logo de Dillo pero el avatar gana altura. */}
         <div
           id="iframe-panel-text"
           role="tabpanel"
           aria-labelledby="iframe-tab-text"
-          className={`absolute inset-0 ${activeMode === 'text' ? 'block' : 'hidden'}`}
+          className={`absolute top-[60px] inset-x-0 bottom-0 ${activeMode === 'text' ? 'block' : 'hidden'}`}
         >
           <TextResponseMode
             isActive={activeMode === 'text'}
@@ -246,7 +270,7 @@ export default function IframeModal({
           id="iframe-panel-hands"
           role="tabpanel"
           aria-labelledby="iframe-tab-hands"
-          className={`absolute inset-0 ${activeMode === 'hands' ? 'flex' : 'hidden'} flex-col`}
+          className={`absolute top-[60px] inset-x-0 bottom-0 ${activeMode === 'hands' ? 'flex' : 'hidden'} flex-col`}
         >
           {handsMounted && !handsLoaded && !handsError && (
             <IframeLoader label="Cargando intérprete de señas…" />
