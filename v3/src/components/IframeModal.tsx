@@ -139,13 +139,21 @@ export default function IframeModal({
 
   return (
     <div
-      className={`fixed inset-0 bg-white ${zIndex} flex flex-col ${
+      className={`fixed inset-0 h-dvh bg-white ${zIndex} flex flex-col ${
         isClosing ? 'opacity-0 pointer-events-none' : 'animate-fade-in'
       } transition-opacity duration-150`}
       onTransitionEnd={() => { if (isClosing) doClose(); }}
     >
       {/* ── Header ─────────────────────────────────────────────────────────────── */}
-      <div className="flex-shrink-0 bg-white border-b border-gray-200">
+      {/* absolute (no flex-shrink:0 + normal flow) a propósito: como flex
+          child reservaba su alto del modal completo, achicando el panel de
+          contenido de abajo (y con él el <iframe> del avatar, que renderiza
+          más chico cuanta menos altura tenga su caja). Flotando por encima,
+          el panel de contenido pasa a ocupar el 100% del modal - el trade-off
+          es que este header ahora tapa lo que haya en la parte superior de
+          cada iframe (logo/cabeza del avatar en el caso de Dillo) en vez de
+          empujarlo hacia abajo. */}
+      <div className="absolute top-0 left-0 right-0 z-20 bg-white border-b border-gray-200">
 
         {/* BUG-10: Patrón ARIA Tabs correcto: role="tablist" + role="tab" + aria-selected */}
         <div className="flex items-center justify-between px-2 py-2 gap-2">
@@ -163,8 +171,8 @@ export default function IframeModal({
                 onClick={() => setActiveMode(mode)}
                 aria-label={label}
                 aria-selected={activeMode === mode}
-                className={`flex items-center justify-center gap-3 py-2.5 px-2 rounded-lg
-                            text-xs font-bold transition-all touch-manipulation flex-1
+                className={`flex flex-col items-center justify-center gap-0.5 py-2 px-1 rounded-lg
+                            text-[11px] font-bold transition-all touch-manipulation flex-1 min-w-0
                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 ${
                   activeMode === mode
                     ? mode === 'dillo'
@@ -175,13 +183,13 @@ export default function IframeModal({
               >
                 {/* BUG-04: wrapper overflow-hidden contiene el scale-[1.8] del LSAHandIcon.
                     onDark solo se pasa a LSAHandIcon (tab hands); Lucide no lo acepta → warning. */}
-                <div className="w-9 h-8 flex-shrink-0 overflow-hidden flex items-center justify-center">
+                <div className="w-8 h-8 flex-shrink-0 overflow-hidden flex items-center justify-center">
                   {mode === 'hands'
                     ? <Icon className="w-5 h-5" onDark={activeMode === mode} />
                     : <Icon className="w-5 h-5" strokeWidth={2.5} />
                   }
                 </div>
-                <span className="truncate">{shortLabel}</span>
+                <span className="leading-none">{shortLabel}</span>
               </button>
             ))}
           </div>

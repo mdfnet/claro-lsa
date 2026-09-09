@@ -5,6 +5,7 @@ export interface Suboption {
   goToModeSelector?: boolean;
   needsAmountInput?: boolean;
   needsPhoneNumber?: boolean;
+  suboptions?: Suboption[];
 }
 
 const MARCAS_BASE = ['Samsung', 'Motorola', 'Apple', 'Xiaomi', 'Honor', 'TCL'] as const;
@@ -14,6 +15,12 @@ export const MARCAS_PARA_COMPRA: Suboption[] = MARCAS_BASE.map(marca => ({
   title: marca,
   speech: `Quiero comprar un celular ${marca}. ¿Qué modelos tienen disponibles?`,
 }));
+
+export const SUBOPCIONES_COMPRAR: Suboption[] = [
+  { id: 'linea-nueva', title: 'Línea nueva', speech: 'Quiero contratar una línea nueva con Claro' },
+  { id: 'equipos',     title: 'Equipos',     suboptions: MARCAS_PARA_COMPRA },
+  { id: 'accesorios',  title: 'Accesorios',  speech: 'Quiero comprar accesorios para celular' },
+];
 
 export const MARCAS_PARA_CAMBIO: Suboption[] = MARCAS_BASE.map(marca => ({
   id: marca.toLowerCase(),

@@ -1,5 +1,6 @@
 import { ChevronRight, Volume2, Camera, Mic, AlertTriangle } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { APP_VERSION, APP_DATE } from '../version';
 
 // CÁMARA/MIC en WelcomeScreen:
 // - Solo consultamos el estado de permisos (Permissions API).
@@ -201,6 +202,9 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             }
           />
         </div>
+        <p className="text-center text-white/40 text-[11px] mt-2 tracking-wide">
+          {APP_VERSION} · {APP_DATE}
+        </p>
       </div>
 
     </div>

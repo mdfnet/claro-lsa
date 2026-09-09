@@ -44,7 +44,7 @@ import IframeModal from './IframeModal';
 import QuickTouchScreen from './QuickTouchScreen';
 import {
   type Suboption,
-  MARCAS_PARA_COMPRA,
+  SUBOPCIONES_COMPRAR,
   SUBOPCIONES_PLANES,
   SUBOPCIONES_FACTURACION,
   SUBOPCIONES_SOPORTE,
@@ -91,6 +91,7 @@ export default function ServiceSelectionScreen() {
     parentTitle: string;
     suboptions: Suboption[];
     animated?: boolean;
+    parent?: { parentTitle: string; suboptions: Suboption[] } | null;
   } | null>(null);
   const [showModeSelector, setShowModeSelector] = useState(false);
   const [amountInput, setAmountInput] = useState<{ parentTitle: string; needsPhoneNumber: boolean } | null>(null);
@@ -156,7 +157,13 @@ export default function ServiceSelectionScreen() {
   useBackHandler(showHelp, () => setShowHelp(false));
   useBackHandler(showHistory, () => { setShowHistory(false); setConfirmClear(false); });
   useBackHandler(activeQuickTouch !== null, () => setActiveQuickTouch(null));
-  useBackHandler(activeSuboptions !== null, () => setActiveSuboptions(null));
+  useBackHandler(activeSuboptions !== null, () => {
+    if (activeSuboptions?.parent) {
+      setActiveSuboptions({ ...activeSuboptions.parent, animated: false });
+    } else {
+      setActiveSuboptions(null);
+    }
+  });
   useBackHandler(showModeSelector, () => setShowModeSelector(false));
   useBackHandler(amountInput !== null, () => { setAmountInput(null); setAmountValue(''); });
   useBackHandler(phoneInput !== null, () => {
@@ -200,6 +207,16 @@ export default function ServiceSelectionScreen() {
   };
 
   const handleSuboptionTap = (sub: Suboption) => {
+    if (sub.suboptions) {
+      const current = activeSuboptions;
+      setActiveSuboptions({
+        parentTitle: sub.title,
+        suboptions: sub.suboptions,
+        animated: false,
+        parent: current ? { parentTitle: current.parentTitle, suboptions: current.suboptions } : null,
+      });
+      return;
+    }
     if (sub.goToModeSelector) {
       setShowModeSelector(true);
       return;
@@ -451,7 +468,13 @@ export default function ServiceSelectionScreen() {
         >
           <OverlayHeader
             title={activeSuboptions.parentTitle}
-            onBack={() => setActiveSuboptions(null)}
+            onBack={() => {
+              if (activeSuboptions.parent) {
+                setActiveSuboptions({ ...activeSuboptions.parent, animated: false });
+              } else {
+                setActiveSuboptions(null);
+              }
+            }}
             titleId="suboptions-title"
           />
 
@@ -801,10 +824,10 @@ export default function ServiceSelectionScreen() {
 // ── Datos de servicios ────────────────────────────────────────────────────────
 
 const QUICK_TOUCH_SERVICES: QuickTouchService[] = [
-  { id: 'buy-phone',         title: 'Comprar un celular', icon: Smartphone,   suboptions: MARCAS_PARA_COMPRA },
+  { id: 'buy-phone',         title: 'Comprar',            icon: Smartphone,   suboptions: SUBOPCIONES_COMPRAR },
   { id: 'billing',           title: 'Facturación',        icon: CreditCard,   suboptions: SUBOPCIONES_FACTURACION },
   { id: 'phone-plans',       title: 'Ver planes',         icon: ShoppingCart, suboptions: SUBOPCIONES_PLANES },
-  { id: 'technical-support', title: 'Soporte técnico',    icon: Headphones,   suboptions: SUBOPCIONES_SOPORTE },
+  { id: 'technical-support', title: 'Servicio técnico',   icon: Headphones,   suboptions: SUBOPCIONES_SOPORTE },
   { id: 'other-procedure',   title: 'Otras gestiones',    icon: FileText,     goToModeSelector: true },
 ];
 

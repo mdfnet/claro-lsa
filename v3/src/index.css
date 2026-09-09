@@ -31,15 +31,18 @@
   html {
     overflow-x: hidden;
     height: 100%;
+    touch-action: pan-x pan-y;
   }
 
   body {
     overflow-x: hidden;
     height: 100%;
+    touch-action: pan-x pan-y;
   }
 
   #root {
     height: 100%;
+    touch-action: pan-x pan-y;
   }
 
   [class*="overflow-y-auto"], [style*="overflow-y: auto"] {
