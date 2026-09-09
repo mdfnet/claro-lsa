@@ -48,6 +48,12 @@
   }
 }
 
+/* Fuera de @layer — prioridad máxima sobre preflight y utilidades.
+   El JS en App.tsx lo sobreescribe con inline style cuando cambia de pantalla. */
+html {
+  background: linear-gradient(to bottom, #DA291C, #A01E13);
+}
+
 @layer utilities {
   .animate-fade-in {
     will-change: opacity;

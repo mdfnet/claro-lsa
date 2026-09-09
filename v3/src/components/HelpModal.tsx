@@ -7,14 +7,19 @@ interface HelpModalProps {
 
 export default function HelpModal({ onClose }: HelpModalProps) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
+    <div
+      className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 animate-fade-in"
+      style={{ height: '100dvh' }}
+      onClick={onClose}
+    >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="help-modal-title"
-        className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90dvh] overflow-y-auto"
+        className="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:max-w-3xl max-h-[90dvh] flex flex-col animate-sheet-up sm:animate-fade-in overscroll-contain"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+        <div className="flex-shrink-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-3xl sm:rounded-t-3xl">
           <img
             src={`${import.meta.env.BASE_URL}icons/claro-logo-red-atlas-2.svg`}
             alt="Claro"
@@ -31,7 +36,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
           </button>
         </div>
 
-        <div className="p-6 space-y-8">
+        <div className="flex-1 overflow-y-auto p-6 space-y-8" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div className="bg-gradient-to-br from-brand to-brand-dark rounded-2xl p-6 sm:p-8 text-center">
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
               <EarOff className="w-8 h-8 sm:w-10 sm:h-10 text-white" strokeWidth={2} />
@@ -108,7 +113,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
           </div>
         </div>
 
-        <div className="sticky bottom-0 bg-white border-t border-gray-100 px-6 py-4 rounded-b-2xl">
+        <div className="flex-shrink-0 bg-white border-t border-gray-100 px-6 py-4">
           <div className="flex items-center justify-center">
             <img
               src={`${import.meta.env.BASE_URL}icons/claro-logo-red-atlas-2.svg`}

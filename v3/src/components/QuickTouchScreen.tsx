@@ -59,6 +59,7 @@ interface QuickTouchScreenProps {
   fullScreen?: boolean;
   showConversation?: boolean;
   onOpenReplyModal?: () => void;
+  skipAnimation?: boolean;
 }
 
 const BAR_COUNT = 5;
@@ -77,6 +78,7 @@ export default function QuickTouchScreen({
   fullScreen = true,
   showConversation = false,
   onOpenReplyModal,
+  skipAnimation = false,
 }: QuickTouchScreenProps) {
   const [speechState, setSpeechState] = useState<SpeechState>('pending');
   const genRef = useRef(0);
@@ -145,7 +147,7 @@ export default function QuickTouchScreen({
   // ── Modo conversación (pass-the-phone) ────────────────────────────────────────
   if (showConversation) {
     return (
-      <div className={`${fullScreen ? 'fixed inset-0 z-[60]' : 'w-full h-full'} bg-white flex flex-col animate-fade-in`}>
+      <div className={`${fullScreen ? 'fixed inset-0 z-[60]' : 'w-full h-full'} bg-white flex flex-col${skipAnimation ? '' : ' animate-fade-in'}`}>
 
         <div className="bg-brand flex-shrink-0 px-5 py-5 sm:py-6 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3.5">
@@ -251,7 +253,7 @@ export default function QuickTouchScreen({
 
   // ── Modo texto (TextResponseMode) ─────────────────────────────────────────────
   return (
-    <div className={`${fullScreen ? 'fixed inset-0 z-[60]' : 'w-full h-full'} bg-white flex flex-col animate-fade-in`}>
+    <div className={`${fullScreen ? 'fixed inset-0 z-[60]' : 'w-full h-full'} bg-white flex flex-col${skipAnimation ? '' : ' animate-fade-in'}`}>
 
       <div className="flex-1 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
         <div className="min-h-full flex flex-col items-center justify-center px-5 py-8 sm:px-8 sm:py-12 text-center gap-5 sm:gap-7">

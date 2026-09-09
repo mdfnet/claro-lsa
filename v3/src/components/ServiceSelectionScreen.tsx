@@ -90,6 +90,7 @@ export default function ServiceSelectionScreen() {
   const [activeSuboptions, setActiveSuboptions] = useState<{
     parentTitle: string;
     suboptions: Suboption[];
+    animated?: boolean;
   } | null>(null);
   const [showModeSelector, setShowModeSelector] = useState(false);
   const [amountInput, setAmountInput] = useState<{ parentTitle: string; needsPhoneNumber: boolean } | null>(null);
@@ -161,7 +162,7 @@ export default function ServiceSelectionScreen() {
   useBackHandler(phoneInput !== null, () => {
     setPhoneInput(null);
     setPhoneValue('');
-    if (backSuboptions) { setActiveSuboptions(backSuboptions); setBackSuboptions(null); }
+    if (backSuboptions) { setActiveSuboptions({ ...backSuboptions, animated: false }); setBackSuboptions(null); }
   });
 
   const activateQuickTouch = (data: {
@@ -409,11 +410,12 @@ export default function ServiceSelectionScreen() {
           icon={activeQuickTouch.icon}
           parentTitle={activeQuickTouch.parentTitle}
           phoneNumber={activeQuickTouch.phoneNumber}
+          skipAnimation={!!activeQuickTouch.parentTitle}
           onClose={() => { setActiveQuickTouch(null); setReplyModal(null); setBackSuboptions(null); }}
           onBack={() => {
             setActiveQuickTouch(null);
             setReplyModal(null);
-            if (backSuboptions) { setActiveSuboptions(backSuboptions); setBackSuboptions(null); }
+            if (backSuboptions) { setActiveSuboptions({ ...backSuboptions, animated: false }); setBackSuboptions(null); }
           }}
           showConversation
           onOpenReplyModal={() => setReplyModal('dillo')}
@@ -445,7 +447,7 @@ export default function ServiceSelectionScreen() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="suboptions-title"
-          className="fixed inset-0 z-[60] bg-white flex flex-col animate-fade-in"
+          className={`fixed inset-0 z-[60] bg-white flex flex-col ${activeSuboptions.animated !== false ? 'animate-fade-in' : ''}`}
         >
           <OverlayHeader
             title={activeSuboptions.parentTitle}
@@ -551,14 +553,14 @@ export default function ServiceSelectionScreen() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="phone-input-title"
-          className="fixed inset-0 z-[60] bg-white flex flex-col animate-fade-in"
+          className="fixed inset-0 z-[60] bg-white flex flex-col"
         >
           <OverlayHeader
             title="Número de línea"
             onBack={() => {
               setPhoneInput(null);
               setPhoneValue('');
-              if (backSuboptions) { setActiveSuboptions(backSuboptions); setBackSuboptions(null); }
+              if (backSuboptions) { setActiveSuboptions({ ...backSuboptions, animated: false }); setBackSuboptions(null); }
             }}
             titleId="phone-input-title"
           />
@@ -608,7 +610,7 @@ export default function ServiceSelectionScreen() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="amount-input-title"
-          className="fixed inset-0 z-[60] bg-white flex flex-col animate-fade-in"
+          className="fixed inset-0 z-[60] bg-white flex flex-col"
         >
           <OverlayHeader
             title={amountInput.parentTitle}

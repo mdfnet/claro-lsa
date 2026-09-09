@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useBackButtonNavigation, useBackHandler } from './hooks/useBackHandler';
 import WelcomeScreen from './components/WelcomeScreen';
 import VideoIntroScreen from './components/VideoIntroScreen';
@@ -7,11 +7,11 @@ import { preloadVoices } from './components/QuickTouchScreen';
 
 type Screen = 'welcome' | 'video-intro' | 'services';
 
-function useThemeColor(themeColor: string, bodyColor: string) {
-  useEffect(() => {
+function useThemeColor(themeColor: string, bodyBackground: string) {
+  useLayoutEffect(() => {
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
-    document.body.style.backgroundColor = bodyColor;
-  }, [themeColor, bodyColor]);
+    document.documentElement.style.background = bodyBackground;
+  }, [themeColor, bodyBackground]);
 }
 
 // iOS Safari requiere que speechSynthesis.speak() ocurra dentro del contexto
@@ -39,11 +39,17 @@ function useSpeechUnlock() {
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
 
-  const screenBodyColor =
-    currentScreen === 'welcome'     ? '#D9291C' :
-    currentScreen === 'video-intro' ? '#D9291C' :
-                                      '#ffffff';
-  useThemeColor(currentScreen === 'services' ? '#ffffff' : '#DA291C', screenBodyColor);
+  const themeByScreen: Record<Screen, string> = {
+    'welcome':     '#DA291C',
+    'video-intro': '#DA291C',
+    'services':    '#ffffff',
+  };
+  const bgByScreen: Record<Screen, string> = {
+    'welcome':     'linear-gradient(to bottom, #DA291C, #A01E13)',
+    'video-intro': 'linear-gradient(to bottom, #DA291C, #A01E13)',
+    'services':    '#f9fafb',
+  };
+  useThemeColor(themeByScreen[currentScreen], bgByScreen[currentScreen]);
   useBackButtonNavigation();
   useBackHandler(currentScreen === 'video-intro', () => setCurrentScreen('welcome'));
   useBackHandler(currentScreen === 'services', () => setCurrentScreen('welcome'));
