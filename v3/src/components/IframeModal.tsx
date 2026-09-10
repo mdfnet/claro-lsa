@@ -250,8 +250,6 @@ export default function IframeModal({
       <div className="flex-1 relative overflow-hidden">
 
         {/* BUG-10: role="tabpanel" con id y aria-labelledby en cada panel */}
-        {/* text y hands: top-[60px] para no quedar tapados por el header flotante.
-            dillo: inset-0 a propósito — el header tapa el logo de Dillo pero el avatar gana altura. */}
         <div
           id="iframe-panel-text"
           role="tabpanel"
@@ -307,7 +305,7 @@ export default function IframeModal({
           id="iframe-panel-dillo"
           role="tabpanel"
           aria-labelledby="iframe-tab-dillo"
-          className={`absolute inset-0 ${activeMode === 'dillo' ? 'flex' : 'hidden'} flex-col`}
+          className={`absolute top-[60px] inset-x-0 bottom-0 ${activeMode === 'dillo' ? 'flex' : 'hidden'} flex-col`}
         >
           {dilloMounted && !dilloLoaded && !dilloError && (
             <IframeLoader label="Cargando avatar de señas…" />
